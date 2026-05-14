@@ -9,6 +9,9 @@ use App\Modules\Inventory\Enums\BorrowStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Modules\Inventory\Models\BorrowRecord
+ */
 class BorrowRecordResource extends JsonResource
 {
     /**
@@ -16,33 +19,37 @@ class BorrowRecordResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
+        /** @var \App\Modules\Inventory\Models\BorrowRecord $record */
+        $record = $this->resource;
+
         return [
-            'id' => $this->id,
-            'borrowable_type' => $this->borrowable_type,
-            'borrowable_id' => $this->borrowable_id,
-            'status' => $this->status?->value,
-            'quantity' => $this->quantity,
-            'borrowed_at' => $this->borrowed_at?->toIso8601String(),
-            'due_at' => $this->due_at?->toIso8601String(),
-            'returned_at' => $this->returned_at?->toIso8601String(),
-            'notes' => $this->notes,
-            'reviewed_at' => $this->reviewed_at?->toIso8601String(),
-            'rejected_reason' => $this->rejected_reason,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'id' => $record->id,
+            'borrowable_type' => $record->borrowable_type,
+            'borrowable_id' => $record->borrowable_id,
+            'status' => $record->status?->value,
+            'quantity' => $record->quantity,
+            'borrowed_at' => $record->borrowed_at?->toIso8601String(),
+            'due_at' => $record->due_at?->toIso8601String(),
+            'returned_at' => $record->returned_at?->toIso8601String(),
+            'notes' => $record->notes,
+            'reviewed_at' => $record->reviewed_at?->toIso8601String(),
+            'rejected_reason' => $record->rejected_reason,
+            'created_at' => $record->created_at?->toIso8601String(),
+            'updated_at' => $record->updated_at?->toIso8601String(),
 
             // Computed flags — avoids repeated logic in the frontend
-            'is_overdue' => $this->status === BorrowStatus::OVERDUE
-                || ($this->due_at && $this->due_at->isPast() && ! $this->returned_at),
-            'is_active' => in_array($this->status, [
+            'is_overdue' => $record->status === BorrowStatus::OVERDUE
+                || ($record->due_at && $record->due_at->isPast() && ! $record->returned_at),
+            'is_active' => in_array($record->status, [
                 BorrowStatus::APPROVED,
                 BorrowStatus::BORROWED,
                 BorrowStatus::OVERDUE,
             ], true),
-            'days_overdue' => $this->due_at && $this->due_at->isPast()
-                ? (int) $this->due_at->diffInDays(now())
+            'days_overdue' => $record->due_at && $record->due_at->isPast()
+                ? (int) $record->due_at->diffInDays(now())
                 : null,
 
             // Relationships (only included when eager-loaded)

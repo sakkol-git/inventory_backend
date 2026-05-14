@@ -38,6 +38,20 @@ return [
             'report' => false,
         ],
 
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'url' => env('APP_URL').'/private-storage',
+            'visibility' => 'private',
+            // For production S3:
+            // 'driver' => 's3',
+            // 'key' => env('AWS_ACCESS_KEY_ID'),
+            // 'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            // 'region' => env('AWS_DEFAULT_REGION'),
+            // 'bucket' => env('AWS_PRIVATE_BUCKET'),
+            // 'visibility' => 'private',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

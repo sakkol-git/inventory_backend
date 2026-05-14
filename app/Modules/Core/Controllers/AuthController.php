@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         // check if user exists and credentials are valid
         if (! $token = $this->jwt()->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
         $user = $this->jwt()->user();
@@ -83,7 +83,7 @@ class AuthController extends Controller
     // Get authenticated user profile
     public function profile(): JsonResponse
     {
-        $user = $this->jwt()->user();
+        $user = $this->jwt()->user()->load('permissions', 'roles');
 
         return response()->json(['data' => new UserResource($user)]);
     }

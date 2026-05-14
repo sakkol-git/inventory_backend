@@ -16,12 +16,6 @@ return new class extends Migration
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->foreignId('chemical_batch_id')
-                ->nullable()
-                ->constrained('chemical_batches')
-                ->nullOnDelete()
-                ->cascadeOnUpdate();
-
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->restrictOnDelete()
@@ -35,6 +29,7 @@ return new class extends Migration
             $table->dateTime('used_at');
             $table->text('notes')->nullable();
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index(['chemical_id', 'used_at']);

@@ -8,28 +8,37 @@ use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Modules\Inventory\Models\Equipment
+ */
 class EquipmentResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
+        /** @var \App\Modules\Inventory\Models\Equipment $equipment */
+        $equipment = $this->resource;
+
+        /** @return array<string, mixed> */
         return [
-            'id' => $this->id,
-            'equipment_name' => $this->equipment_name,
-            'equipment_code' => $this->equipment_code,
-            'category' => $this->category?->value,
-            'status' => $this->status?->value,
-            'condition' => $this->condition?->value,
-            'location' => $this->location,
-            'manufacturer' => $this->manufacturer,
-            'model_name' => $this->model_name,
-            'serial_number' => $this->serial_number,
-            'purchase_date' => $this->purchase_date?->format('Y-m-d'),
-            'purchase_price' => $this->purchase_price,
-            'description' => $this->description,
-            'image_url' => ImageUploadService::resolveImageUrl($this->image_path, $this->image_url),
-            'is_borrowable' => $this->is_borrowable,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'id' => $equipment->id,
+            'equipment_name' => $equipment->equipment_name,
+            'equipment_code' => $equipment->equipment_code,
+            'category' => $equipment->category?->value,
+            'status' => $equipment->status?->value,
+            'condition' => $equipment->condition?->value,
+            'location' => $equipment->location,
+            'manufacturer' => $equipment->manufacturer,
+            'model_name' => $equipment->model_name,
+            'serial_number' => $equipment->serial_number,
+            'purchase_date' => $equipment->purchase_date?->format('Y-m-d'),
+            'purchase_price' => $equipment->purchase_price,
+            'description' => $equipment->description,
+            'image_url' => $equipment->image_url,
+            'is_borrowable' => $equipment->is_borrowable,
+            'created_at' => $equipment->created_at?->toIso8601String(),
+            'updated_at' => $equipment->updated_at?->toIso8601String(),
         ];
     }
+
 }

@@ -16,7 +16,7 @@ class AdminMiddleware
 
         if (! $user || ! $user->hasRole('admin', 'api')) {
             return response()->json([
-                'status' => 'error',
+                'success' => false,
                 'message' => 'Forbidden. Admin access required.',
             ], 403);
         }

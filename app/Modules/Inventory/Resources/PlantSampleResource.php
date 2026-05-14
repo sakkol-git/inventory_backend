@@ -8,38 +8,33 @@ use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Modules\Inventory\Models\PlantSample
+ */
 class PlantSampleResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
+        /** @var \App\Modules\Inventory\Models\PlantSample $sample */
+        $sample = $this->resource;
+
+        /** @return array<string, mixed> */
         return [
-            'id' => $this->id,
-            'identity' => [
-                'name' => $this->sample_name,
-                'code' => $this->sample_code,
-                'status' => $this->status?->value,
-            ],
-            // Relationships — only present when eager-loaded (prevents N+1)
-            'relationships' => [
-                'species' => new PlantSpeciesResource($this->whenLoaded('plantSpecies')),
-                'variety' => new PlantVarietyResource($this->whenLoaded('plantVariety')),
-            ],
-            'details' => [
-                'owner' => $this->owner_name,
-                'department' => $this->department,
-                'origin' => $this->origin_location,
-                'quantity' => $this->quantity,
-            ],
-            'lab_info' => [
-                'brought_at' => $this->brought_at?->format('Y-m-d'),
-                'location' => $this->lab_location?->value,
-            ],
-            'meta' => [
-                'description' => $this->description,
-                'image' => ImageUploadService::resolveImageUrl($this->image_path, $this->image_url),
-                'created_at' => $this->created_at?->toIso8601String(),
-                'updated_at' => $this->updated_at?->toIso8601String(),
-            ],
+            'id' => $sample->id,
+            'sample_name' => $sample->sample_name,
+            'sample_code' => $sample->sample_code,
+            'status' => $sample->status?->value,
+            'owner_name' => $sample->owner_name,
+            'department' => $sample->department,
+            'origin_location' => $sample->origin_location,
+            'quantity' => $sample->quantity,
+            'brought_at' => $sample->brought_at?->toIso8601String(),
+            'lab_location' => $sample->lab_location,
+            'description' => $sample->description,
+            'image_url' => $sample->image_url,
+            'created_at' => $sample->created_at?->toIso8601String(),
+            'updated_at' => $sample->updated_at?->toIso8601String(),
         ];
     }
 }

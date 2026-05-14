@@ -51,11 +51,6 @@ class Chemical extends Model
 
     // ─── Relationships ───────────────────────────────────────────────────────
 
-    public function batches(): HasMany
-    {
-        return $this->hasMany(ChemicalBatch::class);
-    }
-
     public function usageLogs(): HasMany
     {
         return $this->hasMany(ChemicalUsageLog::class);

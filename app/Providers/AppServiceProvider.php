@@ -9,10 +9,8 @@ use App\Modules\Core\Services\Crud\CrudService;
 use App\Modules\Inventory\Models\Achievement;
 use App\Modules\Inventory\Models\BorrowRecord;
 use App\Modules\Inventory\Models\Chemical;
-use App\Modules\Inventory\Models\ChemicalBatch;
 use App\Modules\Inventory\Models\ChemicalUsageLog;
 use App\Modules\Inventory\Models\Equipment;
-use App\Modules\Inventory\Models\MaintenanceRecord;
 use App\Modules\Inventory\Models\PlantSample;
 use App\Modules\Inventory\Models\PlantSpecies;
 use App\Modules\Inventory\Models\PlantStock;
@@ -125,11 +123,9 @@ class AppServiceProvider extends ServiceProvider
             'plant_sample' => PlantSample::class,
             'plant_stock' => PlantStock::class,
             'chemical' => Chemical::class,
-            'chemical_batch' => ChemicalBatch::class,
             'chemical_usage_log' => ChemicalUsageLog::class,
             'equipment' => Equipment::class,
             'borrow_record' => BorrowRecord::class,
-            'maintenance_record' => MaintenanceRecord::class,
             'transaction' => Transaction::class,
             'achievement' => Achievement::class,
             'user_document' => UserDocument::class,

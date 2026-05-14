@@ -8,7 +8,6 @@ use App\Modules\Core\Enums\UserRole;
 use App\Modules\Inventory\Models\Achievement;
 use App\Modules\Inventory\Models\BorrowRecord;
 use App\Modules\Inventory\Models\ChemicalUsageLog;
-use App\Modules\Inventory\Models\MaintenanceRecord;
 use App\Modules\Inventory\Models\PlantSample;
 use App\Modules\Inventory\Models\Transaction;
 use App\Modules\Inventory\Models\UserDocument;
@@ -73,15 +72,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(ChemicalUsageLog::class);
     }
 
-    public function performedMaintenance(): HasMany
+    public function documents(): HasMany
     {
-        return $this->hasMany(MaintenanceRecord::class, 'performed_by');
+        return $this->hasMany(UserDocument::class);
     }
-
-    // public function documents(): HasMany
-    // {
-    //     return $this->hasMany(UserDocument::class);
-    // }
 
     public function achievements(): BelongsToMany
     {

@@ -44,7 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => 'Unauthenticated',
                 ], 401);
             }
@@ -53,7 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => $e->getMessage(),
                     'errors' => $e->errors(),
                 ], 422);
@@ -63,7 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => 'Resource not found',
                 ], 404);
             }
@@ -72,7 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => 'Endpoint not found.',
                 ], 404);
             }
@@ -81,7 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => $e->getMessage() ?: 'Forbidden.',
                 ], 403);
             }
@@ -90,7 +90,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (TooManyRequestsHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => 'Too many requests. Please try again later.',
                 ], 429);
             }
@@ -100,7 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
                 $payload = [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => $status === 500
                         ? 'An unexpected error occurred.'
                         : ($e->getMessage() ?: 'Error'),
