@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Providers;
+
+use App\Modules\Core\Contracts\ICrudService;
+use App\Modules\Core\Models\User;
+use App\Modules\Core\Policies\UserPolicy;
+use App\Modules\Core\Services\Crud\CrudService;
+use App\Modules\Inventory\Models\Achievement;
+use App\Modules\Inventory\Models\BorrowRecord;
+use App\Modules\Inventory\Models\Chemical;
+use App\Modules\Inventory\Models\ChemicalUsageLog;
+use App\Modules\Inventory\Models\Equipment;
+use App\Modules\Inventory\Models\PlantSample;
+use App\Modules\Inventory\Models\PlantSpecies;
+use App\Modules\Inventory\Models\PlantStock;
+use App\Modules\Inventory\Models\PlantVariety;
+use App\Modules\Inventory\Models\Transaction;
+use App\Modules\Inventory\Models\UserDocument;
+use App\Modules\Inventory\Policies\AchievementPolicy;
+use App\Modules\Inventory\Policies\BorrowRecordPolicy;
+use App\Modules\Inventory\Policies\ChemicalPolicy;
+use App\Modules\Inventory\Policies\EquipmentPolicy;
+use App\Modules\Inventory\Policies\PlantSamplePolicy;
+use App\Modules\Inventory\Policies\PlantSpeciesPolicy;
+use App\Modules\Inventory\Policies\PlantStockPolicy;
+use App\Modules\Inventory\Policies\PlantVarietyPolicy;
+use App\Modules\Inventory\Policies\TransactionPolicy;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        if (! class_exists('App\\Modules\\Core\\Services\\ImageUploadService')
+            && class_exists('App\\Modules\\Core\\Services\\ImageUpload\\ImageUploadService')) {
+            class_alias(
+                'App\\Modules\\Core\\Services\\ImageUpload\\ImageUploadService',
+                'App\\Modules\\Core\\Services\\ImageUploadService',
+            );
+        }
+
+        $this->app->bind(ICrudService::class, CrudService::class);
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        $this->configureDefaults();
+        $this->configureMorphMap();
+        $this->configureQueryLogging();
+        // $this->registerObservers();
+        $this->registerGates();
+    }
+
+    /**
+     * Register authorization gates for non-model permissions.
+     */
+    protected function registerGates(): void
+    {
+        // Register model policies
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(PlantSpecies::class, PlantSpeciesPolicy::class);
+        Gate::policy(PlantVariety::class, PlantVarietyPolicy::class);
+        Gate::policy(PlantSample::class, PlantSamplePolicy::class);
+        Gate::policy(PlantStock::class, PlantStockPolicy::class);
+        Gate::policy(Chemical::class, ChemicalPolicy::class);
+        Gate::policy(Equipment::class, EquipmentPolicy::class);
+        Gate::policy(Achievement::class, AchievementPolicy::class);
+        Gate::policy(Transaction::class, TransactionPolicy::class);
+        Gate::policy(BorrowRecord::class, BorrowRecordPolicy::class);
+
+        // Super-admin bypass: users with the spatie 'admin' role can do anything.
+        Gate::before(function ($user) {
+            if ($user->hasRole('admin', 'api')) {
+                return true;
+            }
+        });
+
+        // Gate for role/permission management
+        Gate::define('manage-roles', fn ($user) => $user->hasPermissionTo('manage-roles', 'api'));
+
+        // Gate for report access
+        Gate::define('view-reports', fn ($user) => $user->hasPermissionTo('reports.view', 'api'));
+    }
+
+    /**
+     * Register model observers for workflow side effects.
+     */
+    // protected function registerObservers(): void
+    // {
+    //     \App\Modules\Research\Models\Experiment::observe(\App\Observers\ExperimentObserver::class);
+    //     \App\Modules\Business\Models\Contract::observe(\App\Observers\ContractObserver::class);
+    //     \App\Modules\Business\Models\Payment::observe(\App\Observers\PaymentObserver::class);
+    //     \App\Modules\Business\Models\ContractMilestone::observe(\App\Observers\ContractMilestoneObserver::class);
+    //     \App\Modules\Inventory\Models\BorrowRecord::observe(\App\Observers\BorrowRecordObserver::class);
+    //     \App\Modules\Research\Models\LabNotebook::observe(\App\Observers\LabNotebookObserver::class);
+    //     \App\Modules\Inventory\Models\ChemicalBatch::observe(\App\Observers\ChemicalBatchObserver::class);
+    // }
+
+    /**
+     * Register the polymorphic morph map so DB stores short aliases
+     * instead of fully-qualified class names. Prevents breakage on refactors.
+     */
+    protected function configureMorphMap(): void
+    {
+        Relation::enforceMorphMap([
+            'user' => User::class,
+            'plant_species' => PlantSpecies::class,
+            'plant_variety' => PlantVariety::class,
+            'plant_sample' => PlantSample::class,
+            'plant_stock' => PlantStock::class,
+            'chemical' => Chemical::class,
+            'chemical_usage_log' => ChemicalUsageLog::class,
+            'equipment' => Equipment::class,
+            'borrow_record' => BorrowRecord::class,
+            'transaction' => Transaction::class,
+            'achievement' => Achievement::class,
+            'user_document' => UserDocument::class,
+            // // Research module
+            // 'experiment' => \App\Modules\Research\Models\Experiment::class,
+            // 'growth_log' => \App\Modules\Research\Models\GrowthLog::class,
+            // 'protocol' => \App\Modules\Research\Models\Protocol::class,
+            // 'protocol_step' => \App\Modules\Research\Models\ProtocolStep::class,
+            // 'lab_notebook' => \App\Modules\Research\Models\LabNotebook::class,
+            // 'experiment_material' => \App\Modules\Research\Models\ExperimentMaterial::class,
+            // 'tag' => \App\Modules\Core\Models\Tag::class,
+            // // Business module
+            // 'client' => \App\Modules\Business\Models\Client::class,
+            // 'contract' => \App\Modules\Business\Models\Contract::class,
+            // 'contract_milestone' => \App\Modules\Business\Models\ContractMilestone::class,
+            // 'payment' => \App\Modules\Business\Models\Payment::class,
+            // 'production_forecast' => \App\Modules\Business\Models\ProductionForecast::class,
+            // 'lab_service' => \App\Modules\Business\Models\LabService::class,
+            // 'location_history' => \App\Modules\Inventory\Models\LocationHistory::class,
+        ]);
+    }
+
+    /**
+     * Log slow database queries in development.
+     * Threshold: 500ms (adjust via DB_SLOW_QUERY_MS env var).
+     */
+    protected function configureQueryLogging(): void
+    {
+        if (app()->isProduction()) {
+            return;
+        }
+
+        $threshold = (int) env('DB_SLOW_QUERY_MS', 500);
+
+        DB::listen(function ($query) use ($threshold) {
+            if ($query->time >= $threshold) {
+                logger()->warning('Slow query detected', [
+                    'sql' => $query->sql,
+                    'bindings' => $query->bindings,
+                    'time_ms' => $query->time,
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Configure default behaviors for production-ready applications.
+     */
+    protected function configureDefaults(): void
+    {
+        Date::use(CarbonImmutable::class);
+
+        // Prevent N+1 queries in development; log them silently in production.
+        Model::preventLazyLoading(! app()->isProduction());
+
+        // Prevent silently discarding attributes not in $fillable.
+        Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
+
+        DB::prohibitDestructiveCommands(
+            app()->isProduction(),
+        );
+
+        Password::defaults(fn (): ?Password => app()->isProduction()
+            ? Password::min(12)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
+            : null
+        );
+    }
+}
