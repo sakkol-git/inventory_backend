@@ -1,0 +1,471 @@
+{
+  "test_data": {
+    "users": [
+      {
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "password": "Admin@123",
+        "role": "admin",
+        "description": "Default admin user with all permissions"
+      },
+      {
+        "name": "Lab Manager 1",
+        "email": "labmanager1@example.com",
+        "password": "LabManager@123",
+        "role": "lab_manager",
+        "description": "Can create and update resources"
+      },
+      {
+        "name": "Lab Manager 2",
+        "email": "labmanager2@example.com",
+        "password": "LabManager@123",
+        "role": "lab_manager",
+        "description": "Can create and update resources"
+      },
+      {
+        "name": "Lab Manager 3",
+        "email": "labmanager3@example.com",
+        "password": "LabManager@123",
+        "role": "lab_manager",
+        "description": "Can create and update resources"
+      },
+      {
+        "name": "Student 1",
+        "email": "student1@example.com",
+        "password": "Student@123",
+        "role": "student",
+        "description": "View-only access to resources"
+      },
+      {
+        "name": "Student 2",
+        "email": "student2@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 3",
+        "email": "student3@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 4",
+        "email": "student4@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 5",
+        "email": "student5@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 6",
+        "email": "student6@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 7",
+        "email": "student7@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 8",
+        "email": "student8@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 9",
+        "email": "student9@example.com",
+        "password": "Student@123",
+        "role": "student"
+      },
+      {
+        "name": "Student 10",
+        "email": "student10@example.com",
+        "password": "Student@123",
+        "role": "student"
+      }
+    ],
+    "plants": [
+      {
+        "common_name": "Tomato Plant",
+        "khmer_name": "ដងទម៉ាតូ",
+        "scientific_name": "Solanum lycopersicum",
+        "family": "Solanaceae",
+        "growth_type": "annual",
+        "native_region": "South America",
+        "propagation_method": "Seed",
+        "description": "Popular garden vegetable, rich in lycopene"
+      },
+      {
+        "common_name": "Cabbage",
+        "khmer_name": "ស្ពៃក្បាលរឹង",
+        "scientific_name": "Brassica oleracea var. capitata",
+        "family": "Brassicaceae",
+        "growth_type": "biennial",
+        "native_region": "Europe",
+        "propagation_method": "Seed",
+        "description": "Leafy vegetable, high in vitamin C"
+      },
+      {
+        "common_name": "Basil",
+        "khmer_name": "ម៉ែនរារាក់",
+        "scientific_name": "Ocimum basilicum",
+        "family": "Lamiaceae",
+        "growth_type": "annual",
+        "native_region": "Tropical Asia",
+        "propagation_method": "Seed",
+        "description": "Aromatic herb, used in culinary and medicinal applications"
+      },
+      {
+        "common_name": "Rose",
+        "khmer_name": "ផ្កាកុលាប",
+        "scientific_name": "Rosa spp.",
+        "family": "Rosaceae",
+        "growth_type": "perennial",
+        "native_region": "Asia",
+        "propagation_method": "Cutting",
+        "description": "Flowering plant, popular ornamental"
+      },
+      {
+        "common_name": "Mint",
+        "khmer_name": "ម៉ែនត៍",
+        "scientific_name": "Mentha spp.",
+        "family": "Lamiaceae",
+        "growth_type": "perennial",
+        "native_region": "Europe",
+        "propagation_method": "Seed or Cutting",
+        "description": "Aromatic herb, cooling properties"
+      }
+    ],
+    "chemicals": [
+      {
+        "common_name": "Sulfuric Acid",
+        "category": "acid",
+        "quantity": 500,
+        "storage_location": "Lab A - Cabinet 1",
+        "expiry_date": "2027-12-31",
+        "danger_level": "high",
+        "safety_measures": "Use in fume hood, wear PPE, handle with extreme care",
+        "description": "Concentrated sulfuric acid H2SO4 for laboratory use"
+      },
+      {
+        "common_name": "Sodium Hydroxide",
+        "category": "base",
+        "quantity": 250,
+        "storage_location": "Lab A - Cabinet 2",
+        "expiry_date": "2027-06-30",
+        "danger_level": "high",
+        "safety_measures": "Corrosive, wear gloves and eye protection",
+        "description": "NaOH solution for chemical reactions"
+      },
+      {
+        "common_name": "Acetone",
+        "category": "solvent",
+        "quantity": 1000,
+        "storage_location": "Lab B - Flammable Cabinet",
+        "expiry_date": "2026-12-31",
+        "danger_level": "medium",
+        "safety_measures": "Flammable, keep away from heat and sparks",
+        "description": "Organic solvent for extraction and cleaning"
+      },
+      {
+        "common_name": "Hydrogen Peroxide",
+        "category": "oxidizer",
+        "quantity": 750,
+        "storage_location": "Lab C - Shelf 2",
+        "expiry_date": "2027-03-31",
+        "danger_level": "medium",
+        "safety_measures": "Oxidizing agent, store away from organic materials",
+        "description": "3% H2O2 solution for disinfection"
+      },
+      {
+        "common_name": "Ethanol",
+        "category": "solvent",
+        "quantity": 2000,
+        "storage_location": "Lab B - Flammable Cabinet",
+        "expiry_date": "2027-09-30",
+        "danger_level": "medium",
+        "safety_measures": "Flammable, volatile organic compound",
+        "description": "95% ethanol for sterilization and extraction"
+      }
+    ],
+    "equipment": [
+      {
+        "equipment_name": "Compound Microscope",
+        "category": "microscope",
+        "status": "available",
+        "condition": "good",
+        "location": "Lab C - Bench 1",
+        "manufacturer": "Olympus",
+        "model_name": "BX53",
+        "serial_number": "SN-BX53-001",
+        "purchase_date": "2024-01-15",
+        "purchase_price": 5000.00,
+        "description": "Advanced compound microscope with digital camera attachment"
+      },
+      {
+        "equipment_name": "Centrifuge Machine",
+        "category": "centrifuge",
+        "status": "available",
+        "condition": "good",
+        "location": "Lab A - Counter Top",
+        "manufacturer": "Eppendorf",
+        "model_name": "5810R",
+        "serial_number": "SN-5810R-002",
+        "purchase_date": "2024-02-10",
+        "purchase_price": 3500.00,
+        "description": "Refrigerated centrifuge for sample separation"
+      },
+      {
+        "equipment_name": "Incubator",
+        "category": "incubator",
+        "status": "available",
+        "condition": "good",
+        "location": "Lab B - Climate Room",
+        "manufacturer": "Memmert",
+        "model_name": "IN55",
+        "serial_number": "SN-IN55-003",
+        "purchase_date": "2024-03-05",
+        "purchase_price": 2800.00,
+        "description": "Temperature-controlled incubator for cultures"
+      },
+      {
+        "equipment_name": "UV Spectrophotometer",
+        "category": "spectrophotometer",
+        "status": "available",
+        "condition": "good",
+        "location": "Lab C - Bench 2",
+        "manufacturer": "Shimadzu",
+        "model_name": "UV-1900",
+        "serial_number": "SN-UV1900-004",
+        "purchase_date": "2024-04-12",
+        "purchase_price": 4200.00,
+        "description": "Spectrophotometer for absorption measurements"
+      },
+      {
+        "equipment_name": "Digital Scale",
+        "category": "other",
+        "status": "available",
+        "condition": "normal",
+        "location": "Lab A - Bench 1",
+        "manufacturer": "Mettler-Toledo",
+        "model_name": "AX204",
+        "serial_number": "SN-AX204-005",
+        "purchase_date": "2024-05-08",
+        "purchase_price": 1500.00,
+        "description": "Analytical balance for precise weighing"
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Lab Beginner",
+        "description": "Complete your first laboratory task",
+        "icon_url": "https://via.placeholder.com/100?text=Beginner",
+        "level": "bronze"
+      },
+      {
+        "name": "Lab Expert",
+        "description": "Complete 50 laboratory procedures successfully",
+        "icon_url": "https://via.placeholder.com/100?text=Expert",
+        "level": "gold"
+      },
+      {
+        "name": "Equipment Master",
+        "description": "Borrow and return 25 pieces of equipment without issues",
+        "icon_url": "https://via.placeholder.com/100?text=Master",
+        "level": "platinum"
+      },
+      {
+        "name": "Chemical Handler",
+        "description": "Log 10 chemical usage records",
+        "icon_url": "https://via.placeholder.com/100?text=Handler",
+        "level": "silver"
+      },
+      {
+        "name": "Plant Scientist",
+        "description": "Study 5 different plant species",
+        "icon_url": "https://via.placeholder.com/100?text=Scientist",
+        "level": "gold"
+      }
+    ],
+    "negative_test_cases": [
+      {
+        "name": "SQL Injection - Email Field",
+        "endpoint": "POST /auth/login",
+        "payload": {
+          "email": "' OR 1=1 --",
+          "password": "password"
+        },
+        "expected_status": 401,
+        "expected_error": "Invalid credentials"
+      },
+      {
+        "name": "XSS - Name Field",
+        "endpoint": "POST /auth/register",
+        "payload": {
+          "name": "<script>alert('xss')</script>",
+          "email": "test@example.com",
+          "password": "Password@123",
+          "password_confirmation": "Password@123"
+        },
+        "expected_status": 422,
+        "expected_error": "Validation error"
+      },
+      {
+        "name": "Missing Required Field",
+        "endpoint": "POST /auth/login",
+        "payload": {
+          "email": "test@example.com"
+        },
+        "expected_status": 422,
+        "expected_error": "Password is required"
+      },
+      {
+        "name": "Invalid Email Format",
+        "endpoint": "POST /auth/register",
+        "payload": {
+          "name": "Test User",
+          "email": "invalid-email",
+          "password": "Password@123",
+          "password_confirmation": "Password@123"
+        },
+        "expected_status": 422,
+        "expected_error": "Invalid email format"
+      },
+      {
+        "name": "Weak Password",
+        "endpoint": "POST /auth/register",
+        "payload": {
+          "name": "Test User",
+          "email": "test@example.com",
+          "password": "weak",
+          "password_confirmation": "weak"
+        },
+        "expected_status": 422,
+        "expected_error": "Password too weak"
+      },
+      {
+        "name": "Password Mismatch",
+        "endpoint": "POST /auth/register",
+        "payload": {
+          "name": "Test User",
+          "email": "test@example.com",
+          "password": "Password@123",
+          "password_confirmation": "Different@123"
+        },
+        "expected_status": 422,
+        "expected_error": "Passwords do not match"
+      },
+      {
+        "name": "Duplicate Email",
+        "endpoint": "POST /auth/register",
+        "payload": {
+          "name": "Duplicate User",
+          "email": "admin@example.com",
+          "password": "Password@123",
+          "password_confirmation": "Password@123"
+        },
+        "expected_status": 422,
+        "expected_error": "Email already exists"
+      },
+      {
+        "name": "Invalid Enum Value",
+        "endpoint": "POST /plant-species",
+        "payload": {
+          "common_name": "Test Plant",
+          "scientific_name": "Test spp.",
+          "growth_type": "invalid_type",
+          "family": "Solanaceae"
+        },
+        "expected_status": 422,
+        "expected_error": "Invalid growth type"
+      },
+      {
+        "name": "Non-existent Resource",
+        "endpoint": "GET /users/99999",
+        "expected_status": 404,
+        "expected_error": "Resource not found"
+      },
+      {
+        "name": "Unauthorized Access",
+        "endpoint": "GET /users",
+        "user_role": "student",
+        "expected_status": 403,
+        "expected_error": "Unauthorized"
+      }
+    ],
+    "edge_cases": [
+      {
+        "name": "Empty String",
+        "test": "Set name field to empty string",
+        "payload": {
+          "name": "",
+          "email": "test@example.com"
+        },
+        "expected": "Validation error"
+      },
+      {
+        "name": "Maximum Length",
+        "test": "Set name to 256+ characters",
+        "payload": {
+          "name": "a" * 256
+        },
+        "expected": "Validation error - exceeds max length"
+      },
+      {
+        "name": "Null Values",
+        "test": "Send null instead of string",
+        "payload": {
+          "name": null
+        },
+        "expected": "Type error or validation error"
+      },
+      {
+        "name": "Special Characters",
+        "test": "Unicode and special characters in text fields",
+        "payload": {
+          "name": "นั้น 中文 العربية emoji🎉"
+        },
+        "expected": "Should accept and store correctly"
+      },
+      {
+        "name": "Future Date",
+        "test": "Set borrow due_at to far future",
+        "payload": {
+          "due_at": "2099-12-31"
+        },
+        "expected": "Should accept"
+      },
+      {
+        "name": "Past Date",
+        "test": "Set borrow due_at to past",
+        "payload": {
+          "due_at": "2020-01-01"
+        },
+        "expected": "Validation error - must be future date"
+      },
+      {
+        "name": "Negative Numbers",
+        "test": "Set quantity to negative",
+        "payload": {
+          "quantity": -100
+        },
+        "expected": "Validation error - must be positive"
+      },
+      {
+        "name": "Large Numbers",
+        "test": "Set quantity to very large number",
+        "payload": {
+          "quantity": 999999999
+        },
+        "expected": "Should accept or validation error based on limits"
+      }
+    ]
+  }
+}

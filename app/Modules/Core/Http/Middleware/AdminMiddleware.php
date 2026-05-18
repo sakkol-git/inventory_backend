@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Core\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Spatie\Permission\Traits\HasRoles;
+use Symfony\Component\HttpFoundation\Response;
+
+class AdminMiddleware
+{
+    use HasRoles;
+
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user('api');
+
+        if (! $user || ! $user->hasRole('admin', 'api')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden. Admin access required.',
+            ], 403);
+        }
+
+        return $next($request);
+    }
+}
