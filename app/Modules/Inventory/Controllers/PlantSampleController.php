@@ -107,6 +107,6 @@ class PlantSampleController extends Controller
 
         return response()->json([
             'message' => 'Plant sample deleted successfully.',
-        ], 204);
+        ]);
     }
 }

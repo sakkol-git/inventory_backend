@@ -24,6 +24,11 @@ class BorrowService
         return $this->requestService->requestBorrow($user, $data);
     }
 
+    public function borrow(User $user, array $data): BorrowRecord
+    {
+        return $this->requestService->borrow($user, $data);
+    }
+
     public function approveRequest(User $reviewer, BorrowRecord $record): BorrowRecord
     {
         return $this->approveService->approveBorrow($reviewer, $record);

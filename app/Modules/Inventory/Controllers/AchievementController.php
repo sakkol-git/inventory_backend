@@ -6,6 +6,7 @@ namespace App\Modules\Inventory\Controllers;
 
 use App\Modules\Core\Contracts\ICrudService;
 use App\Modules\Core\Http\Controllers\Controller;
+use App\Modules\Core\Models\User;
 use App\Modules\Inventory\Models\Achievement;
 use App\Modules\Inventory\Requests\Achievement\StoreAchievementRequest;
 use App\Modules\Inventory\Requests\Achievement\UpdateAchievementRequest;
@@ -97,5 +98,38 @@ class AchievementController extends Controller
         );
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Assign an achievement to a user.
+     *
+     * POST /achievements/{achievement}/assign/{user}
+     */
+    public function assign(Achievement $achievement, User $user): JsonResponse
+    {
+        $this->authorize('assign', $achievement);
+
+        $this->assignmentService->assignToUser($achievement, $user);
+
+        return response()->json([
+            'message' => 'Achievement assigned successfully.',
+            'achievement' => new AchievementResource($achievement->load('users:id')),
+        ]);
+    }
+
+    /**
+     * Revoke an achievement from a user.
+     *
+     * DELETE /achievements/{achievement}/revoke/{user}
+     */
+    public function revoke(Achievement $achievement, User $user): JsonResponse
+    {
+        $this->authorize('revoke', $achievement);
+
+        $this->assignmentService->revokeFromUser($achievement, $user);
+
+        return response()->json([
+            'message' => 'Achievement revoked successfully.',
+        ]);
     }
 }

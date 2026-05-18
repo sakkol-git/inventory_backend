@@ -28,7 +28,6 @@ class PlantSample extends Model
 
     // fillable fields
     protected $fillable = [
-        'plant_species_id',
         'plant_variety_id',
         'contributor_id',
         'sample_name',
@@ -56,10 +55,19 @@ class PlantSample extends Model
         ];
     }
 
-    // relationships
-    public function plantSpecies(): BelongsTo
+    // ─── Computed Attributes ─────────────────────────────────────────────────
+
+    /**
+     * Calculate total quantity from related PlantStock records.
+     * Falls back to the quantity field if no stocks exist.
+     */
+    protected function getStockQuantityAttribute(): ?int
     {
-        return $this->belongsTo(PlantSpecies::class, 'plant_species_id');
+        $stocksSum = $this->stocks()
+            ->whereNull('deleted_at')
+            ->sum('quantity');
+
+        return $stocksSum > 0 ? $stocksSum : $this->quantity;
     }
 
     public function plantVariety(): BelongsTo

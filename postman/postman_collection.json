@@ -1,0 +1,1263 @@
+{
+  "info": {
+    "name": "Inventory Management API - Complete Enterprise Testing Suite v2.0",
+    "description": "Complete professional Postman collection with ALL endpoints, comprehensive CRUD operations, advanced workflows, security tests, edge cases, and all business logic",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication & Setup",
+      "item": [
+        {
+          "name": "Auth - Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.test('Has token', () => pm.expect(pm.response.json().data).to.have.property('token'));",
+                  "pm.test('Has user data', () => pm.expect(pm.response.json().data).to.have.property('user'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Test Student {{$timestamp}}\",\n  \"email\": \"student{{$timestamp}}@example.com\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\",\n  \"phone\": \"+1-555-{{$randomInt}}\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "Auth - Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful', () => pm.expect(pm.response.code).to.equal(200));",
+                  "const data = pm.response.json().data;",
+                  "pm.environment.set('admin_token', data.token);",
+                  "pm.environment.set('token', data.token);",
+                  "pm.environment.set('admin_id', data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Auth - Login (Lab Manager)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json().data;",
+                  "pm.environment.set('lab_manager_token', data.token);",
+                  "pm.environment.set('lab_manager_id', data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"labmanager1@example.com\",\n  \"password\": \"LabManager@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Auth - Login (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json().data;",
+                  "pm.environment.set('student_token', data.token);",
+                  "pm.environment.set('student_id', data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"Student@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Auth - Get Current Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Profile retrieved', () => pm.expect(pm.response.code).to.equal(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"]}
+          }
+        },
+        {
+          "name": "Auth - Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {"raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth", "logout"]}
+          }
+        },
+        {
+          "name": "Auth - Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["const data = pm.response.json().data; pm.environment.set('token', data.token);"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {"raw": "{{base_url}}/auth/refresh", "host": ["{{base_url}}"], "path": ["auth", "refresh"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 User Management - Complete",
+      "item": [
+        {
+          "name": "Users - Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["const data = pm.response.json().data; pm.environment.set('last_created_user_id', data.id);"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"New User {{$timestamp}}\",\n  \"email\": \"user{{$timestamp}}@example.com\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\",\n  \"phone\": \"555-9999\",\n  \"role\": \"student\"\n}"},
+            "url": {"raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"]}
+          }
+        },
+        {
+          "name": "Users - Get All Users (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/users?page=1&per_page=20", "host": ["{{base_url}}"], "path": ["users"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Users - Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/users/{{admin_id}}", "host": ["{{base_url}}"], "path": ["users", "{{admin_id}}"]}
+          }
+        },
+        {
+          "name": "Users - Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"555-1111\"\n}"},
+            "url": {"raw": "{{base_url}}/users/{{last_created_user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{last_created_user_id}}"]}
+          }
+        },
+        {
+          "name": "Users - Delete User (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/users/{{last_created_user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{last_created_user_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Profile Management - Complete",
+      "item": [
+        {
+          "name": "Profile - Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/profile", "host": ["{{base_url}}"], "path": ["profile"]}
+          }
+        },
+        {
+          "name": "Profile - Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"555-0000\"\n}"},
+            "url": {"raw": "{{base_url}}/profile", "host": ["{{base_url}}"], "path": ["profile"]}
+          }
+        },
+        {
+          "name": "Profile - Get My Contributions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/profile/contributions", "host": ["{{base_url}}"], "path": ["profile", "contributions"]}
+          }
+        },
+        {
+          "name": "Profile - Get My Achievements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/profile/achievements", "host": ["{{base_url}}"], "path": ["profile", "achievements"]}
+          }
+        },
+        {
+          "name": "Profile - Get My Activity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/profile/activity", "host": ["{{base_url}}"], "path": ["profile", "activity"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🌿 Plant Module - Complete (4 Sub-modules)",
+      "item": [
+        {
+          "name": "1️⃣ Plant Species - CRUD",
+          "item": [
+            {
+              "name": "Species - Create",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_plant_species_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Tomato {{$timestamp}}\",\n  \"khmer_name\": \"ដងទម៉ាតូ\",\n  \"scientific_name\": \"Solanum lycopersicum {{$timestamp}}\",\n  \"family\": \"Solanaceae\",\n  \"growth_type\": \"annual\",\n  \"native_region\": \"South America\",\n  \"propagation_method\": \"Seed\",\n  \"description\": \"Popular garden vegetable\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-species", "host": ["{{base_url}}"], "path": ["plant-species"]}
+              }
+            },
+            {
+              "name": "Species - Get All (Paginated)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-species?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["plant-species"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+              }
+            },
+            {
+              "name": "Species - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-species/{{test_plant_species_id}}", "host": ["{{base_url}}"], "path": ["plant-species", "{{test_plant_species_id}}"]}
+              }
+            },
+            {
+              "name": "Species - Update",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Updated Tomato\",\n  \"description\": \"Updated description with more info\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-species/{{test_plant_species_id}}", "host": ["{{base_url}}"], "path": ["plant-species", "{{test_plant_species_id}}"]}
+              }
+            },
+            {
+              "name": "Species - Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-species/{{test_plant_species_id}}", "host": ["{{base_url}}"], "path": ["plant-species", "{{test_plant_species_id}}"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "2️⃣ Plant Varieties - CRUD",
+          "item": [
+            {
+              "name": "Varieties - Create",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_plant_variety_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"family_id\": 1,\n  \"variety_name\": \"Cherry Tomato {{$timestamp}}\",\n  \"description\": \"Small, sweet variety perfect for salads\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-varieties", "host": ["{{base_url}}"], "path": ["plant-varieties"]}
+              }
+            },
+            {
+              "name": "Varieties - Get All",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-varieties?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["plant-varieties"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+              }
+            },
+            {
+              "name": "Varieties - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-varieties/{{test_plant_variety_id}}", "host": ["{{base_url}}"], "path": ["plant-varieties", "{{test_plant_variety_id}}"]}
+              }
+            },
+            {
+              "name": "Varieties - Update",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"variety_name\": \"Updated Variety Name\",\n  \"description\": \"Updated description\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-varieties/{{test_plant_variety_id}}", "host": ["{{base_url}}"], "path": ["plant-varieties", "{{test_plant_variety_id}}"]}
+              }
+            },
+            {
+              "name": "Varieties - Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-varieties/{{test_plant_variety_id}}", "host": ["{{base_url}}"], "path": ["plant-varieties", "{{test_plant_variety_id}}"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "3️⃣ Plant Samples - CRUD",
+          "item": [
+            {
+              "name": "Samples - Create",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_plant_sample_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"variety_id\": 1,\n  \"growth_stage\": \"seedling\",\n  \"health_status\": \"healthy\",\n  \"notes\": \"First batch of samples\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-samples", "host": ["{{base_url}}"], "path": ["plant-samples"]}
+              }
+            },
+            {
+              "name": "Samples - Get All",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-samples?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["plant-samples"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+              }
+            },
+            {
+              "name": "Samples - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-samples/{{test_plant_sample_id}}", "host": ["{{base_url}}"], "path": ["plant-samples", "{{test_plant_sample_id}}"]}
+              }
+            },
+            {
+              "name": "Samples - Update",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"growth_stage\": \"vegetative\",\n  \"health_status\": \"healthy\",\n  \"notes\": \"Growing well, ready for next stage\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-samples/{{test_plant_sample_id}}", "host": ["{{base_url}}"], "path": ["plant-samples", "{{test_plant_sample_id}}"]}
+              }
+            },
+            {
+              "name": "Samples - Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-samples/{{test_plant_sample_id}}", "host": ["{{base_url}}"], "path": ["plant-samples", "{{test_plant_sample_id}}"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "4️⃣ Plant Stocks - CRUD",
+          "item": [
+            {
+              "name": "Stocks - Create",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_plant_stock_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"plant_sample_id\": 1,\n  \"quantity\": 100,\n  \"reserved_quantity\": 0,\n  \"status\": \"healthy\",\n  \"location\": \"Greenhouse A\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-stocks", "host": ["{{base_url}}"], "path": ["plant-stocks"]}
+              }
+            },
+            {
+              "name": "Stocks - Get All",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-stocks?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["plant-stocks"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+              }
+            },
+            {
+              "name": "Stocks - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-stocks/{{test_plant_stock_id}}", "host": ["{{base_url}}"], "path": ["plant-stocks", "{{test_plant_stock_id}}"]}
+              }
+            },
+            {
+              "name": "Stocks - Update",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"quantity\": 85,\n  \"reserved_quantity\": 15,\n  \"status\": \"healthy\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-stocks/{{test_plant_stock_id}}", "host": ["{{base_url}}"], "path": ["plant-stocks", "{{test_plant_stock_id}}"]}
+              }
+            },
+            {
+              "name": "Stocks - Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {"raw": "{{base_url}}/plant-stocks/{{test_plant_stock_id}}", "host": ["{{base_url}}"], "path": ["plant-stocks", "{{test_plant_stock_id}}"]}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "⚗️ Chemical Module - Complete (2 Sub-modules)",
+      "item": [
+        {
+          "name": "1️⃣ Chemicals - CRUD",
+          "item": [
+            {
+              "name": "Chemicals - Create",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_chemical_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Sulfuric Acid {{$timestamp}}\",\n  \"chemical_code\": \"SA-{{$timestamp}}\",\n  \"category\": \"acid\",\n  \"quantity\": 500,\n  \"storage_location\": \"Lab A - Cabinet 1\",\n  \"expiry_date\": \"2027-12-31\",\n  \"danger_level\": \"high\",\n  \"safety_measures\": \"Use in fume hood with PPE\",\n  \"description\": \"Concentrated sulfuric acid for lab experiments\"\n}"},
+                "url": {"raw": "{{base_url}}/chemicals", "host": ["{{base_url}}"], "path": ["chemicals"]}
+              }
+            },
+            {
+              "name": "Chemicals - Get All (Paginated)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemicals?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["chemicals"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+              }
+            },
+            {
+              "name": "Chemicals - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemicals/{{test_chemical_id}}", "host": ["{{base_url}}"], "path": ["chemicals", "{{test_chemical_id}}"]}
+              }
+            },
+            {
+              "name": "Chemicals - Update",
+              "request": {
+                "method": "PUT",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"quantity\": 400,\n  \"storage_location\": \"Lab B - Cabinet 2\"\n}"},
+                "url": {"raw": "{{base_url}}/chemicals/{{test_chemical_id}}", "host": ["{{base_url}}"], "path": ["chemicals", "{{test_chemical_id}}"]}
+              }
+            },
+            {
+              "name": "Chemicals - Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemicals/{{test_chemical_id}}", "host": ["{{base_url}}"], "path": ["chemicals", "{{test_chemical_id}}"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "2️⃣ Chemical Usage Logs - Create & View",
+          "item": [
+            {
+              "name": "Usage Logs - Create Log",
+              "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_usage_log_id', pm.response.json().data.id);"]}}],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"chemical_id\": 1,\n  \"quantity_used\": 50,\n  \"unit\": \"ml\",\n  \"used_by_id\": 1,\n  \"notes\": \"Used in experiment A for pH testing\",\n  \"date\": \"2026-05-17\"\n}"},
+                "url": {"raw": "{{base_url}}/chemical-usage-logs", "host": ["{{base_url}}"], "path": ["chemical-usage-logs"]}
+              }
+            },
+            {
+              "name": "Usage Logs - Get All",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemical-usage-logs?page=1&per_page=20", "host": ["{{base_url}}"], "path": ["chemical-usage-logs"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+              }
+            },
+            {
+              "name": "Usage Logs - Get By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemical-usage-logs/{{test_usage_log_id}}", "host": ["{{base_url}}"], "path": ["chemical-usage-logs", "{{test_usage_log_id}}"]}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔧 Equipment Module - Complete",
+      "item": [
+        {
+          "name": "Equipment - Create",
+          "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_equipment_id', pm.response.json().data.id);"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"equipment_name\": \"Microscope {{$timestamp}}\",\n  \"equipment_code\": \"MICRO-{{$timestamp}}\",\n  \"category\": \"microscope\",\n  \"status\": \"available\",\n  \"condition\": \"good\",\n  \"location\": \"Lab C - Bench 1\",\n  \"manufacturer\": \"Olympus\",\n  \"model_name\": \"BX53\",\n  \"serial_number\": \"SN-{{$timestamp}}\",\n  \"purchase_date\": \"2024-01-15\",\n  \"purchase_price\": 5000.00,\n  \"description\": \"Advanced compound microscope for research\"\n}"},
+            "url": {"raw": "{{base_url}}/equipment", "host": ["{{base_url}}"], "path": ["equipment"]}
+          }
+        },
+        {
+          "name": "Equipment - Get All (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/equipment?page=1&per_page=15", "host": ["{{base_url}}"], "path": ["equipment"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "15"}]}
+          }
+        },
+        {
+          "name": "Equipment - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/equipment/{{test_equipment_id}}", "host": ["{{base_url}}"], "path": ["equipment", "{{test_equipment_id}}"]}
+          }
+        },
+        {
+          "name": "Equipment - Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"status\": \"in_use\",\n  \"condition\": \"normal\",\n  \"location\": \"Lab D - Bench 2\"\n}"},
+            "url": {"raw": "{{base_url}}/equipment/{{test_equipment_id}}", "host": ["{{base_url}}"], "path": ["equipment", "{{test_equipment_id}}"]}
+          }
+        },
+        {
+          "name": "Equipment - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/equipment/{{test_equipment_id}}", "host": ["{{base_url}}"], "path": ["equipment", "{{test_equipment_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Borrowing Module - Complete",
+      "item": [
+        {
+          "name": "Borrow Records - Create Request",
+          "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_borrow_id', pm.response.json().data.id);"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"borrowable_id\": 1,\n  \"quantity\": 1,\n  \"due_at\": \"2026-05-25\",\n  \"notes\": \"Needed for lab experiment on plant morphology\"\n}"},
+            "url": {"raw": "{{base_url}}/borrow-records", "host": ["{{base_url}}"], "path": ["borrow-records"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/borrow-records?page=1&per_page=20", "host": ["{{base_url}}"], "path": ["borrow-records"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Borrow Records - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/borrow-records/{{test_borrow_id}}", "host": ["{{base_url}}"], "path": ["borrow-records", "{{test_borrow_id}}"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Get Pending Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/borrow-records/pending", "host": ["{{base_url}}"], "path": ["borrow-records", "pending"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Get Overdue Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/borrow-records/overdue", "host": ["{{base_url}}"], "path": ["borrow-records", "overdue"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Approve Request",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {"raw": "{{base_url}}/borrow-records/{{test_borrow_id}}/approve", "host": ["{{base_url}}"], "path": ["borrow-records", "{{test_borrow_id}}", "approve"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Reject Request",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"reason\": \"Equipment currently under maintenance, will be available next week\"\n}"},
+            "url": {"raw": "{{base_url}}/borrow-records/{{test_borrow_id}}/reject", "host": ["{{base_url}}"], "path": ["borrow-records", "{{test_borrow_id}}", "reject"]}
+          }
+        },
+        {
+          "name": "Borrow Records - Return Item",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"condition\": \"good\",\n  \"notes\": \"Equipment in excellent condition, no issues\"\n}"},
+            "url": {"raw": "{{base_url}}/borrow-records/{{test_borrow_id}}/return", "host": ["{{base_url}}"], "path": ["borrow-records", "{{test_borrow_id}}", "return"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎖️ Achievements Module - Complete",
+      "item": [
+        {
+          "name": "Achievements - Create",
+          "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_achievement_id', pm.response.json().data.id);"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Lab Master {{$timestamp}}\",\n  \"description\": \"Complete 50 successful laboratory procedures\",\n  \"icon_url\": \"https://via.placeholder.com/100?text=Master\",\n  \"level\": \"gold\"\n}"},
+            "url": {"raw": "{{base_url}}/achievements", "host": ["{{base_url}}"], "path": ["achievements"]}
+          }
+        },
+        {
+          "name": "Achievements - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/achievements", "host": ["{{base_url}}"], "path": ["achievements"]}
+          }
+        },
+        {
+          "name": "Achievements - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/achievements/{{test_achievement_id}}", "host": ["{{base_url}}"], "path": ["achievements", "{{test_achievement_id}}"]}
+          }
+        },
+        {
+          "name": "Achievements - Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"description\": \"Complete 100 successful laboratory procedures\",\n  \"level\": \"platinum\"\n}"},
+            "url": {"raw": "{{base_url}}/achievements/{{test_achievement_id}}", "host": ["{{base_url}}"], "path": ["achievements", "{{test_achievement_id}}"]}
+          }
+        },
+        {
+          "name": "Achievements - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/achievements/{{test_achievement_id}}", "host": ["{{base_url}}"], "path": ["achievements", "{{test_achievement_id}}"]}
+          }
+        },
+        {
+          "name": "Achievements - Assign to User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {"raw": "{{base_url}}/achievements/{{test_achievement_id}}/assign/{{student_id}}", "host": ["{{base_url}}"], "path": ["achievements", "{{test_achievement_id}}", "assign", "{{student_id}}"]}
+          }
+        },
+        {
+          "name": "Achievements - Revoke from User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/achievements/{{test_achievement_id}}/revoke/{{student_id}}", "host": ["{{base_url}}"], "path": ["achievements", "{{test_achievement_id}}", "revoke", "{{student_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "📄 User Documents Module",
+      "item": [
+        {
+          "name": "Documents - Create (Upload)",
+          "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_document_id', pm.response.json().data.id);"]}}],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "title", "value": "Lab Report {{$timestamp}}", "type": "text"},
+                {"key": "document_type", "value": "report", "type": "text"},
+                {"key": "description", "value": "Lab experiment results and analysis", "type": "text"},
+                {"key": "file", "value": "@/path/to/document.pdf", "type": "file"}
+              ]
+            },
+            "url": {"raw": "{{base_url}}/user-documents", "host": ["{{base_url}}"], "path": ["user-documents"]}
+          }
+        },
+        {
+          "name": "Documents - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/user-documents?page=1&per_page=20", "host": ["{{base_url}}"], "path": ["user-documents"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Documents - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/user-documents/{{test_document_id}}", "host": ["{{base_url}}"], "path": ["user-documents", "{{test_document_id}}"]}
+          }
+        },
+        {
+          "name": "Documents - Download",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/user-documents/{{test_document_id}}/download", "host": ["{{base_url}}"], "path": ["user-documents", "{{test_document_id}}", "download"]}
+          }
+        },
+        {
+          "name": "Documents - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/user-documents/{{test_document_id}}", "host": ["{{base_url}}"], "path": ["user-documents", "{{test_document_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard & Analytics",
+      "item": [
+        {
+          "name": "Dashboard - Get Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/dashboard", "host": ["{{base_url}}"], "path": ["dashboard"]}
+          }
+        },
+        {
+          "name": "Transactions - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/transactions?page=1&per_page=20", "host": ["{{base_url}}"], "path": ["transactions"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Transactions - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/transactions/{{test_transaction_id}}", "host": ["{{base_url}}"], "path": ["transactions", "{{test_transaction_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notifications & Activity",
+      "item": [
+        {
+          "name": "Notifications - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"]}
+          }
+        },
+        {
+          "name": "Notifications - Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/notifications/unread-count", "host": ["{{base_url}}"], "path": ["notifications", "unread-count"]}
+          }
+        },
+        {
+          "name": "Notifications - Mark as Read",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {"raw": "{{base_url}}/notifications/1/read", "host": ["{{base_url}}"], "path": ["notifications", "1", "read"]}
+          }
+        },
+        {
+          "name": "Notifications - Mark All as Read",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {"raw": "{{base_url}}/notifications/read-all", "host": ["{{base_url}}"], "path": ["notifications", "read-all"]}
+          }
+        },
+        {
+          "name": "Notifications - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/notifications/1", "host": ["{{base_url}}"], "path": ["notifications", "1"]}
+          }
+        },
+        {
+          "name": "Activity Logs - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/activity-logs?page=1&per_page=30", "host": ["{{base_url}}"], "path": ["activity-logs"], "query": [{"key": "page", "value": "1"}, {"key": "per_page", "value": "30"}]}
+          }
+        },
+        {
+          "name": "Activity Logs - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/activity-logs/1", "host": ["{{base_url}}"], "path": ["activity-logs", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Search & Global Operations",
+      "item": [
+        {
+          "name": "Global Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/search?q=tomato&type=plant", "host": ["{{base_url}}"], "path": ["search"], "query": [{"key": "q", "value": "tomato"}, {"key": "type", "value": "plant"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍💼 Admin - Roles & Permissions",
+      "item": [
+        {
+          "name": "Roles - Create",
+          "event": [{"listen": "test", "script": {"exec": ["pm.environment.set('test_role_id', pm.response.json().data.id);"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Lab Technician\",\n  \"description\": \"Lab technician with limited admin capabilities\"\n}"},
+            "url": {"raw": "{{base_url}}/roles", "host": ["{{base_url}}"], "path": ["roles"]}
+          }
+        },
+        {
+          "name": "Roles - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles", "host": ["{{base_url}}"], "path": ["roles"]}
+          }
+        },
+        {
+          "name": "Roles - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}"]}
+          }
+        },
+        {
+          "name": "Roles - Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"description\": \"Updated lab technician role description\"\n}"},
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}"]}
+          }
+        },
+        {
+          "name": "Roles - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}"]}
+          }
+        },
+        {
+          "name": "Roles - Get Permissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/1/permissions", "host": ["{{base_url}}"], "path": ["roles", "1", "permissions"]}
+          }
+        },
+        {
+          "name": "Roles - Assign Permission",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"permission\": \"plants.create\"\n}"},
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}/permissions", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}", "permissions"]}
+          }
+        },
+        {
+          "name": "Roles - Revoke Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}/permissions/plants.delete", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}", "permissions", "plants.delete"]}
+          }
+        },
+        {
+          "name": "Roles - Get Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/1/users", "host": ["{{base_url}}"], "path": ["roles", "1", "users"]}
+          }
+        },
+        {
+          "name": "Roles - Assign to User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"user_id\": 5\n}"},
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}/users", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}", "users"]}
+          }
+        },
+        {
+          "name": "Roles - Revoke from User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles/{{test_role_id}}/users/5", "host": ["{{base_url}}"], "path": ["roles", "{{test_role_id}}", "users", "5"]}
+          }
+        },
+        {
+          "name": "Permissions - Create",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"custom.permission\",\n  \"description\": \"Custom permission for specific operation\"\n}"},
+            "url": {"raw": "{{base_url}}/permissions", "host": ["{{base_url}}"], "path": ["permissions"]}
+          }
+        },
+        {
+          "name": "Permissions - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/permissions", "host": ["{{base_url}}"], "path": ["permissions"]}
+          }
+        },
+        {
+          "name": "Permissions - Get By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/permissions/1", "host": ["{{base_url}}"], "path": ["permissions", "1"]}
+          }
+        },
+        {
+          "name": "Permissions - Update",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"description\": \"Updated permission description\"\n}"},
+            "url": {"raw": "{{base_url}}/permissions/1", "host": ["{{base_url}}"], "path": ["permissions", "1"]}
+          }
+        },
+        {
+          "name": "Permissions - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "{{base_url}}/permissions/1", "host": ["{{base_url}}"], "path": ["permissions", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚨 Security & Negative Tests",
+      "item": [
+        {
+          "name": "SEC - SQL Injection Test",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"' OR 1=1 --\",\n  \"password\": \"anything\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "SEC - XSS Payload Test",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"<script>alert('xss')</script>\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "SEC - Missing Required Field",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@example.com\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "SEC - Invalid Token",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "invalid.token.xyz", "type": "string"}]},
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"]}
+          }
+        },
+        {
+          "name": "SEC - Unauthorized Role Access",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{student_token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/roles", "host": ["{{base_url}}"], "path": ["roles"]}
+          }
+        },
+        {
+          "name": "SEC - Unauthenticated Access",
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Edge Cases & Validation",
+      "item": [
+        {
+          "name": "EDGE - Empty String",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "EDGE - Invalid Email",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"User\",\n  \"email\": \"not-an-email\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "EDGE - Weak Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"123\",\n  \"password_confirmation\": \"123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "EDGE - Duplicate Email",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password@123\",\n  \"password_confirmation\": \"Password@123\"\n}"},
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]}
+          }
+        },
+        {
+          "name": "EDGE - Invalid Enum",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Plant\",\n  \"scientific_name\": \"Test spp.\",\n  \"growth_type\": \"invalid\",\n  \"family\": \"Test\"\n}"},
+            "url": {"raw": "{{base_url}}/plant-species", "host": ["{{base_url}}"], "path": ["plant-species"]}
+          }
+        },
+        {
+          "name": "EDGE - Non-existent Resource",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/users/99999", "host": ["{{base_url}}"], "path": ["users", "99999"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 Advanced Workflows",
+      "item": [
+        {
+          "name": "WORKFLOW - Complete Plant Research Lifecycle",
+          "item": [
+            {
+              "name": "Step 1: Lab Manager creates plant species",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{lab_manager_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Research Tomato\",\n  \"scientific_name\": \"Solanum lycopersicum research\",\n  \"family\": \"Solanaceae\",\n  \"growth_type\": \"annual\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-species", "host": ["{{base_url}}"], "path": ["plant-species"]}
+              }
+            },
+            {
+              "name": "Step 2: Lab Manager creates variety",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{lab_manager_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"family_id\": 1,\n  \"variety_name\": \"Research Variety\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-varieties", "host": ["{{base_url}}"], "path": ["plant-varieties"]}
+              }
+            },
+            {
+              "name": "Step 3: Lab Manager creates sample",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{lab_manager_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"variety_id\": 1,\n  \"growth_stage\": \"seedling\",\n  \"health_status\": \"healthy\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-samples", "host": ["{{base_url}}"], "path": ["plant-samples"]}
+              }
+            },
+            {
+              "name": "Step 4: Lab Manager records stock",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{lab_manager_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"plant_sample_id\": 1,\n  \"quantity\": 100,\n  \"status\": \"healthy\"\n}"},
+                "url": {"raw": "{{base_url}}/plant-stocks", "host": ["{{base_url}}"], "path": ["plant-stocks"]}
+              }
+            },
+            {
+              "name": "Step 5: Student views all data",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{student_token}}"}],
+                "url": {"raw": "{{base_url}}/plant-species", "host": ["{{base_url}}"], "path": ["plant-species"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "WORKFLOW - Equipment Borrow-Approve-Return",
+          "item": [
+            {
+              "name": "Step 1: Create equipment (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"equipment_name\": \"Test Microscope\",\n  \"category\": \"microscope\",\n  \"status\": \"available\",\n  \"condition\": \"good\",\n  \"location\": \"Lab A\"\n}"},
+                "url": {"raw": "{{base_url}}/equipment", "host": ["{{base_url}}"], "path": ["equipment"]}
+              }
+            },
+            {
+              "name": "Step 2: Student requests borrow",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{student_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"borrowable_id\": 1,\n  \"quantity\": 1,\n  \"due_at\": \"2026-05-25\",\n  \"notes\": \"For research project\"\n}"},
+                "url": {"raw": "{{base_url}}/borrow-records", "host": ["{{base_url}}"], "path": ["borrow-records"]}
+              }
+            },
+            {
+              "name": "Step 3: Lab Manager approves",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Authorization", "value": "Bearer {{lab_manager_token}}"}],
+                "body": {"mode": "raw", "raw": "{}"},
+                "url": {"raw": "{{base_url}}/borrow-records/1/approve", "host": ["{{base_url}}"], "path": ["borrow-records", "1", "approve"]}
+              }
+            },
+            {
+              "name": "Step 4: Student returns equipment",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Authorization", "value": "Bearer {{student_token}}"}],
+                "body": {"mode": "raw", "raw": "{\n  \"condition\": \"good\"\n}"},
+                "url": {"raw": "{{base_url}}/borrow-records/1/return", "host": ["{{base_url}}"], "path": ["borrow-records", "1", "return"]}
+              }
+            }
+          ]
+        },
+        {
+          "name": "WORKFLOW - Chemical Inventory Management",
+          "item": [
+            {
+              "name": "Step 1: Create chemical",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"common_name\": \"Acetic Acid\",\n  \"chemical_code\": \"AA-001\",\n  \"category\": \"acid\",\n  \"quantity\": 1000,\n  \"expiry_date\": \"2027-12-31\",\n  \"danger_level\": \"medium\"\n}"},
+                "url": {"raw": "{{base_url}}/chemicals", "host": ["{{base_url}}"], "path": ["chemicals"]}
+              }
+            },
+            {
+              "name": "Step 2: Record usage",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"chemical_id\": 1,\n  \"quantity_used\": 100,\n  \"notes\": \"Used in experiment\"\n}"},
+                "url": {"raw": "{{base_url}}/chemical-usage-logs", "host": ["{{base_url}}"], "path": ["chemical-usage-logs"]}
+              }
+            },
+            {
+              "name": "Step 3: Verify reduced inventory",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {"raw": "{{base_url}}/chemicals/1", "host": ["{{base_url}}"], "path": ["chemicals", "1"]}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

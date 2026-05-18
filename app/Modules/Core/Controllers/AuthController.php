@@ -11,6 +11,7 @@ use App\Modules\Core\Requests\Auth\LoginRequest;
 use App\Modules\Core\Requests\Auth\RegisterRequest;
 use App\Modules\Core\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cookie;
 use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 use Spatie\Permission\Models\Role;
 
@@ -83,7 +84,8 @@ class AuthController extends Controller
     // Get authenticated user profile
     public function profile(): JsonResponse
     {
-        $user = $this->jwt()->user()->load('permissions', 'roles');
+        $user = User::with('permissions', 'roles')
+            ->find($this->jwt()->user()->id);
 
         return response()->json(['data' => new UserResource($user)]);
     }
@@ -94,7 +96,7 @@ class AuthController extends Controller
         $this->jwt()->logout();
 
         // Clear the token cookie
-        $cookie = cookie()->forget(config('jwt.cookie_key_name', 'token'));
+        $cookie = Cookie::forget(config('jwt.cookie_key_name', 'token'));
 
         return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
     }

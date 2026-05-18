@@ -33,4 +33,22 @@ class AchievementPolicy
     {
         return $user->hasPermissionTo('achievements.delete', 'api');
     }
+
+    /**
+     * Determine if the user can assign achievements to other users.
+     * Typically only admins can assign achievements.
+     */
+    public function assign(User $user, Achievement $achievement): bool
+    {
+        return $user->hasPermissionTo('achievements.assign', 'api');
+    }
+
+    /**
+     * Determine if the user can revoke achievements from users.
+     * Typically only admins can revoke achievements.
+     */
+    public function revoke(User $user, Achievement $achievement): bool
+    {
+        return $user->hasPermissionTo('achievements.revoke', 'api');
+    }
 }

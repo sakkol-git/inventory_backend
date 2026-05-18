@@ -15,6 +15,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $plant_species_id
+ * @property int|null $plant_variety_id
+ * @property int|null $plant_sample_id
+ * @property int $quantity
+ * @property int $reserved_quantity
+ * @property StockStatus $status
+ * @property int $available_quantity Computed: quantity - reserved_quantity
+ */
 class PlantStock extends Model
 {
     /** @use HasFactory<PlantStockFactory> */

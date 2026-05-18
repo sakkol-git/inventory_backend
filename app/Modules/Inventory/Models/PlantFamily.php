@@ -23,9 +23,8 @@ class PlantFamily extends Model
     protected $table = 'plant_families';
 
     protected $fillable = [
-        'name'
+        'name',
     ];
-
 
     // ─── Relationships ───────────────────────────────────────────────────────
 
@@ -33,7 +32,6 @@ class PlantFamily extends Model
     {
         return $this->hasMany(PlantSpecies::class, 'plant_family_id');
     }
-
 
     // public function experiments(): HasMany
     // {

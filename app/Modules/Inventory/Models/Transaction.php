@@ -28,6 +28,7 @@ class Transaction extends Model
         'transactionable_id',
         'action',
         'quantity',
+        'balance_after',
         'note',
     ];
 

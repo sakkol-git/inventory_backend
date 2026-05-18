@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Services;
 
+use App\Exceptions\ChemicalExpiredException;
+use App\Exceptions\StockCannotBeNegativeException;
 use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\Crud\TransactionService;
 use App\Modules\Inventory\Enums\TransactionAction;
 use App\Modules\Inventory\Models\Chemical;
 use App\Modules\Inventory\Models\ChemicalUsageLog;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+
 class ChemicalUsageService
 {
     public function __construct(
@@ -19,6 +21,10 @@ class ChemicalUsageService
 
     /**
      * Record a chemical usage entry, decrement stock, and log the transaction.
+     *
+     * @param array{chemical_id: int, quantity_used: float, notes?: string, ...} $data
+     *
+     * @throws StockCannotBeNegativeException
      */
     public function create(array $data, User $user): ChemicalUsageLog
     {
@@ -29,19 +35,32 @@ class ChemicalUsageService
                 ->lockForUpdate()
                 ->findOrFail($data['chemical_id']);
 
+            if ($chemical->is_expired) {
+                throw new ChemicalExpiredException(
+                    $chemical->id,
+                    $chemical->expiry_date?->toDateString() ?? 'unknown'
+                );
+            }
+
             $quantityUsed = (float) $data['quantity_used'];
             $decrementQty = (int) ceil($quantityUsed);
 
             if ($decrementQty <= 0) {
-                throw ValidationException::withMessages([
-                    'quantity_used' => ['Quantity used must be greater than zero.'],
-                ]);
+                throw new StockCannotBeNegativeException(
+                    'Chemical',
+                    $chemical->quantity,
+                    -$decrementQty,
+                    'Quantity used must be greater than zero.'
+                );
             }
 
             if ($chemical->quantity < $decrementQty) {
-                throw ValidationException::withMessages([
-                    'quantity_used' => ['Insufficient chemical stock available.'],
-                ]);
+                throw new StockCannotBeNegativeException(
+                    'Chemical',
+                    $chemical->quantity,
+                    $decrementQty,
+                    'Insufficient chemical stock available.'
+                );
             }
 
             $log = ChemicalUsageLog::create($data);

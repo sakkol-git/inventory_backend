@@ -56,12 +56,12 @@ class PlantVariety extends Model
             return;
         }
 
-        $escaped = $this->escapeLike($term);
+        $escaped = strtolower($this->escapeLike($term));
 
         $query->where(function (Builder $q) use ($escaped): void {
-            $q->where('name', 'ILIKE', "%{$escaped}%")
-                ->orWhere('variety_code', 'ILIKE', "%{$escaped}%")
-                ->orWhere('description', 'ILIKE', "%{$escaped}%");
+            $q->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])
+                ->orWhereRaw('LOWER(variety_code) LIKE ?', ["%{$escaped}%"])
+                ->orWhereRaw('LOWER(description) LIKE ?', ["%{$escaped}%"]);
         });
     }
 }

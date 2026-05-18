@@ -7,6 +7,7 @@ namespace App\Modules\Core\Controllers;
 use App\Modules\Core\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Activitylog\Models\Activity;
 
 /**
@@ -28,6 +29,8 @@ class ActivityLogController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        Gate::authorize('view-reports');
+
         $request->validate([
             'causer_id' => ['integer', 'exists:users,id'],
             'subject_type' => ['string', 'max:100'],
@@ -38,7 +41,7 @@ class ActivityLogController extends Controller
             'per_page' => ['integer', 'min:1', 'max:50'],
         ]);
 
-        $perPage = min((int) $request->query('per_page', 20), 50);
+        $perPage = min((int) $request->query('per_page', '20'), 50);
 
         $query = Activity::query()
             ->with('causer:id,name,email')
@@ -101,6 +104,8 @@ class ActivityLogController extends Controller
      */
     public function show(int $id): JsonResponse
     {
+        Gate::authorize('view-reports');
+
         $log = Activity::with('causer:id,name,email')->findOrFail($id);
 
         return response()->json([

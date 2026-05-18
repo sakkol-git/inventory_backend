@@ -27,7 +27,13 @@ class BorrowRecordController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', BorrowRecord::class);
+        $user = $request->user('api');
+
+        if ($this->canViewAll($user)) {
+            $this->authorize('viewAny', BorrowRecord::class);
+        } else {
+            $request->merge(['user_id' => $user?->id]);
+        }
 
         $records = $this->crudList->listItems(
             BorrowRecord::class,
@@ -38,6 +44,7 @@ class BorrowRecordController extends Controller
                 'status' => 'status',
                 'borrower_id' => 'user_id',
                 'user_id' => 'user_id',
+                'borrowable_type' => 'borrowable_type',
                 'borrowable_id' => 'borrowable_id',
                 'equipment_id' => 'borrowable_id',
             ],
@@ -48,6 +55,12 @@ class BorrowRecordController extends Controller
 
     public function pending(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user('api');
+
+        if (! $this->canManageBorrows($user)) {
+            abort(403, 'Forbidden.');
+        }
+
         $this->authorize('viewAny', BorrowRecord::class);
         $request->merge(['pending_only' => true]);
 
@@ -72,6 +85,12 @@ class BorrowRecordController extends Controller
 
     public function overdue(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user('api');
+
+        if (! $this->canManageBorrows($user)) {
+            abort(403, 'Forbidden.');
+        }
+
         $this->authorize('viewAny', BorrowRecord::class);
         $request->merge(['overdue_only' => true]);
 
@@ -101,10 +120,12 @@ class BorrowRecordController extends Controller
     {
         $this->authorize('create', BorrowRecord::class);
 
-        $record = $this->borrowService->requestBorrow(
-            $request->user('api'),
-            $request->validated()
-        );
+        $user = $request->user('api');
+        $data = $request->validated();
+
+        $record = $this->canManageBorrows($user)
+            ? $this->borrowService->borrow($user, $data)
+            : $this->borrowService->requestBorrow($user, $data);
 
         return (new BorrowRecordResource($record->loadMissing(['user', 'borrowable', 'reviewer'])))
             ->response()
@@ -165,5 +186,25 @@ class BorrowRecordController extends Controller
         );
 
         return new BorrowRecordResource($record->loadMissing(['user', 'borrowable', 'reviewer']));
+    }
+
+    private function canViewAll(?\App\Modules\Core\Models\User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasAnyRole(['admin', 'lab_manager'], 'api')
+            || $user->hasPermissionTo('borrows.view', 'api');
+    }
+
+    private function canManageBorrows(?\App\Modules\Core\Models\User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasAnyRole(['admin', 'lab_manager'], 'api')
+            || $user->hasPermissionTo('borrows.approve', 'api');
     }
 }

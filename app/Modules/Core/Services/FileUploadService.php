@@ -6,6 +6,7 @@ namespace App\Modules\Core\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -82,15 +83,16 @@ class FileUploadService
 
     /**
      * Generate a time-limited signed URL for downloading a private file.
+     * Works with local disks by creating a signed route instead of driver-dependent temporaryUrl().
      *
-     * @param  string  $storagePath  Path returned by validateAndStore()
+     * @param  int  $documentId  Document/UserDocument ID (used in signed route)
      * @param  int  $minutes  URL expiry in minutes (default 60)
      */
-    public function temporaryUrl(string $storagePath, int $minutes = 60, string $disk =
-'private'): string
+    public function signedDownloadUrl(int $documentId, int $minutes = 60): string
     {
-        return Storage::disk($disk)->temporaryUrl(
-            $storagePath,
+        return URL::signedRoute(
+            'user-documents.download',
+            ['userDocument' => $documentId],
             now()->addMinutes($minutes)
         );
     }

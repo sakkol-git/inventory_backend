@@ -12,15 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
-        DB::statement(
-            'UPDATE transactions AS t
-            SET t.user_id = NULL
-            WHERE t.user_id IS NOT NULL
-            AND NOT EXISTS (
-                SELECT 1 FROM users u WHERE u.id = t.user_id
-            )'
-        );
         Schema::table('transactions', function (Blueprint $table) {
             // FK: user_id → users(id) NULL on delete (preserve audit trail)
 
@@ -43,7 +34,6 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropIndex('txn_user_idx');
             $table->dropIndex('txn_morphable_created_idx');
-            $table->dropForeign(['user_id']);
         });
     }
 };

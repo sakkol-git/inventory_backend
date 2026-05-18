@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('plant_species', function (Blueprint $table) {
             $table->id();
             // Relationships info
-            $table->foreignId('family_id')->nullable()->constrained('plant_family')->nullOnDelete();
+            $table->foreignId('family_id')->nullable()->constrained('plant_families')->nullOnDelete();
 
             // core info
             $table->string('common_name');

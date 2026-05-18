@@ -69,8 +69,18 @@ class CacheApiResponse
     {
         $path = $request->path();
 
-        // Extract the first two segments: api/experiments → experiments
+        // Extract the resource segment: api/v1/experiments → experiments
         $segments = explode('/', $path);
+
+        if (($segments[0] ?? null) !== 'api') {
+            return $segments[0] ?? null;
+        }
+
+        $version = $segments[1] ?? null;
+
+        if ($version !== null && str_starts_with($version, 'v')) {
+            return $segments[2] ?? null;
+        }
 
         return $segments[1] ?? null;
     }

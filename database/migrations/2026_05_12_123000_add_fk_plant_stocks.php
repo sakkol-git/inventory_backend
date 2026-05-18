@@ -32,15 +32,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement(
-            'ALTER TABLE plant_stocks DROP CONSTRAINT chk_quantity_non_negative'
-        );
-
-        //
         Schema::table('plant_stocks', function (Blueprint $table) {
             $table->dropIndex('ps_sample_variety_idx');
-            $table->dropForeign(['plant_variety_id']);
-            $table->dropForeign(['plant_sample_id']);
         });
     }
 };

@@ -6,11 +6,16 @@ namespace App\Modules\Inventory\Resources;
 
 use App\Modules\Core\Resources\UserResource;
 use App\Modules\Inventory\Enums\BorrowStatus;
+use App\Modules\Inventory\Models\BorrowRecord;
+use App\Modules\Inventory\Models\Chemical;
+use App\Modules\Inventory\Models\Equipment;
+use App\Modules\Inventory\Models\PlantSample;
+use App\Modules\Inventory\Models\PlantStock;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Modules\Inventory\Models\BorrowRecord
+ * @mixin BorrowRecord
  */
 class BorrowRecordResource extends JsonResource
 {
@@ -22,7 +27,7 @@ class BorrowRecordResource extends JsonResource
     /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
-        /** @var \App\Modules\Inventory\Models\BorrowRecord $record */
+        /** @var BorrowRecord $record */
         $record = $this->resource;
 
         return [
@@ -53,9 +58,26 @@ class BorrowRecordResource extends JsonResource
                 : null,
 
             // Relationships (only included when eager-loaded)
-            'borrowable' => EquipmentResource::make($this->whenLoaded('borrowable')),
+            'borrowable' => $this->resolveBorrowableResource(),
             'borrower' => UserResource::make($this->whenLoaded('user')),
             'reviewer' => UserResource::make($this->whenLoaded('reviewer')),
         ];
+    }
+
+    private function resolveBorrowableResource(): ?JsonResource
+    {
+        if (! $this->relationLoaded('borrowable')) {
+            return null;
+        }
+
+        $borrowable = $this->borrowable;
+
+        return match (true) {
+            $borrowable instanceof Equipment => new EquipmentResource($borrowable),
+            $borrowable instanceof Chemical => new ChemicalResource($borrowable),
+            $borrowable instanceof PlantStock => new PlantStockResource($borrowable),
+            $borrowable instanceof PlantSample => new PlantSampleResource($borrowable),
+            default => null,
+        };
     }
 }

@@ -34,10 +34,40 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'role' => 'admin',
+            'role' => 'student',
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Indicate that the user has an admin role.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the user has a lab-manager role.
+     */
+    public function labManager(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'lab_manager',
+        ]);
+    }
+
+    /**
+     * Indicate that the user has a student role.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'student',
+        ]);
     }
 
     /**

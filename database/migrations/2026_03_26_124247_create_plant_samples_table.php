@@ -19,11 +19,6 @@ return new class extends Migration
             $table->string('sample_code');
             $table->index('sample_code'); // uniqueness enforced at app level (soft-delete aware)
 
-            // Relationships
-            $table->foreignId('plant_species_id')
-                ->constrained('plant_species')
-                ->restrictOnDelete()
-                ->cascadeOnUpdate();
             $table->foreignId('plant_variety_id')
                 ->nullable()
                 ->constrained('plant_varieties')
@@ -55,7 +50,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Performance Optimization
-            $table->index(['plant_species_id', 'plant_variety_id', 'status']);
+            $table->index(['plant_variety_id', 'status']);
         });
     }
 

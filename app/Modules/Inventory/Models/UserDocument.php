@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Models;
 
+use App\Modules\Core\Models\User;
 use Database\Factories\UserDocumentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
-use App\Modules\Core\Models\User;
 
 class UserDocument extends Model
 {

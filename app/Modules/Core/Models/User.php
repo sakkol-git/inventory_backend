@@ -98,7 +98,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function isLabManager(): bool
     {
-        return $this->hasRole('lab-manager', 'api');
+        return $this->hasRole('lab_manager', 'api');
     }
 
     public function isStudent(): bool

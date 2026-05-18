@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Inventory\Controllers;
 
 use App\Modules\Core\Http\Controllers\Controller;
-
 use App\Modules\Inventory\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 

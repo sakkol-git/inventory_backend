@@ -95,4 +95,26 @@ class AchievementAssignmentService
 
         $achievement->users()->sync($syncData);
     }
+
+    /**
+     * Assign an achievement to a single user.
+     */
+    public function assignToUser(Achievement $achievement, User $user): void
+    {
+        DB::transaction(function () use ($achievement, $user): void {
+            $achievement->users()->attach($user->id, [
+                'earned_at' => now(),
+            ]);
+        });
+    }
+
+    /**
+     * Revoke an achievement from a user.
+     */
+    public function revokeFromUser(Achievement $achievement, User $user): void
+    {
+        DB::transaction(function () use ($achievement, $user): void {
+            $achievement->users()->detach($user->id);
+        });
+    }
 }

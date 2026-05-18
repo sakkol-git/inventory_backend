@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Services;
 
+use App\Modules\Core\Models\User;
 use App\Modules\Inventory\Enums\BorrowStatus;
 use App\Modules\Inventory\Models\BorrowRecord;
 use App\Modules\Inventory\Models\Chemical;
@@ -13,7 +14,6 @@ use App\Modules\Inventory\Models\PlantSpecies;
 use App\Modules\Inventory\Models\PlantStock;
 use App\Modules\Inventory\Models\PlantVariety;
 use App\Modules\Inventory\Models\Transaction;
-use App\Modules\Core\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -41,6 +41,7 @@ class DashboardService
                 'users' => User::count(),
                 'active_borrows' => BorrowRecord::whereIn('status', [
                     BorrowStatus::BORROWED->value,
+                    BorrowStatus::APPROVED->value,
                     BorrowStatus::PENDING->value,
                 ])->count(),
                 'total_borrows' => BorrowRecord::count(),
@@ -57,11 +58,11 @@ class DashboardService
     {
         return Cache::remember('dashboard:alerts', 30, function (): array {
             return [
-                'expiring_chemicals' => Chemical::expiringSoon()->count(),
-                'expired_chemicals' => Chemical::expired()->count(),
-                'overdue_borrows' => BorrowRecord::overdue()->count(),
-                'pending_borrows' => BorrowRecord::where('status', BorrowStatus::PENDING->value)->count(),
-                'low_stock_chemicals' => Chemical::lowStock()->count(),
+                'expiring_chemicals' => Chemical::query()->expiringSoon()->count(),
+                'expired_chemicals' => Chemical::query()->expired()->count(),
+                'overdue_borrows' => BorrowRecord::query()->overdue()->count(),
+                'pending_borrows' => BorrowRecord::query()->where('status', BorrowStatus::PENDING->value)->count(),
+                'low_stock_chemicals' => Chemical::query()->lowStock()->count(),
             ];
         });
     }

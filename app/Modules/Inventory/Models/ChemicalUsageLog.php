@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Models;
 
+use App\Modules\Core\Models\User;
 use Database\Factories\ChemicalUsageLogFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Modules\Core\Models\User;
 
 class ChemicalUsageLog extends Model
 {
@@ -45,34 +46,32 @@ class ChemicalUsageLog extends Model
         return $this->belongsTo(Chemical::class);
     }
 
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-
     // ─── Scopes ──────────────────────────────────────────────────────────────
 
-    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    #[Scope]
     protected function forChemical(Builder $query, int $chemicalId): void
     {
         $query->where('chemical_id', $chemicalId);
     }
 
-    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    #[Scope]
     protected function forUser(Builder $query, int $userId): void
     {
         $query->where('user_id', $userId);
     }
 
-    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    #[Scope]
     protected function recent(Builder $query, int $days = 30): void
     {
         $query->where('used_at', '>=', now()->subDays($days));
     }
 
-    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    #[Scope]
     protected function betweenDates(Builder $query, string $from, string $to): void
     {
         $query->whereBetween('used_at', [$from, $to]);

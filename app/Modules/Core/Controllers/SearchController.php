@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Core\Controllers;
 
+use App\Modules\Core\Concerns\EscapesSearchTerm;
 use App\Modules\Core\Http\Controllers\Controller;
 // use App\Modules\Business\Models\Client;
 // use App\Modules\Business\Models\Contract;
@@ -25,6 +26,8 @@ use Illuminate\Http\Request;
  */
 class SearchController extends Controller
 {
+    use EscapesSearchTerm;
+
     private const MAX_PER_TYPE = 5;
 
     /**
@@ -97,7 +100,7 @@ class SearchController extends Controller
             'limit' => ['integer', 'min:1', 'max:10'],
         ]);
 
-        $term = $request->input('q');
+        $term = strtolower($this->escapeLike($request->input('q')));
         $limit = (int) $request->input('limit', self::MAX_PER_TYPE);
         $results = [];
 
@@ -106,8 +109,8 @@ class SearchController extends Controller
 
             $query->where(function ($q) use ($config, $term) {
                 foreach ($config['fields'] as $i => $field) {
-                    $method = $i === 0 ? 'where' : 'orWhere';
-                    $q->$method($field, 'ILIKE', "%{$term}%");
+                    $method = $i === 0 ? 'whereRaw' : 'orWhereRaw';
+                    $q->$method('LOWER('.$field.') LIKE ?', ["%{$term}%"]);
                 }
             });
 

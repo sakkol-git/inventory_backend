@@ -39,7 +39,6 @@ class StorePlantSampleRequest extends FormRequest
             ],
 
             // Relationships
-            'plant_species_id' => ['required', 'integer', 'exists:plant_species,id'],
             'plant_variety_id' => ['nullable', 'integer', 'exists:plant_varieties,id'],
 
             // Ownership & Origin

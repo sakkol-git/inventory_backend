@@ -4,66 +4,57 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Services\Borrow;
 
+use App\Exceptions\InvalidBorrowStatusTransitionException;
 use App\Modules\Core\Models\User;
-use App\Modules\Core\Services\Crud\TransactionService;
 use App\Modules\Inventory\Enums\BorrowStatus;
-use App\Modules\Inventory\Enums\EquipmentStatus;
-use App\Modules\Inventory\Enums\TransactionAction;
 use App\Modules\Inventory\Models\BorrowRecord;
-use App\Modules\Inventory\Models\Equipment;
 use App\Modules\Inventory\Notification\BorrowRecord\BorrowApprovedNotification;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class ApproveRequestService
 {
-    // This service will handle the approval logic for borrow requests, including validating the request,
-    // updating the borrow record status, and sending notifications to the borrower.
-
+    /**
+     * Approve a borrow request and update equipment status.
+     *
+     * @throws InvalidBorrowStatusTransitionException
+     */
     public function __construct(
-        public readonly TransactionService $transaction
+        public readonly BorrowableResolver $borrowableResolver
     ) {}
 
     public function approveBorrow(User $reviewer, BorrowRecord $record): BorrowRecord
     {
-        return DB::transaction(function () use ($reviewer, $record) {
+        $updatedRecord = DB::transaction(function () use ($reviewer, $record) {
             $record = BorrowRecord::lockForUpdate()->findOrFail($record->id);
-            $equipment = Equipment::lockForUpdate()->findOrFail($record->borrowable_id);
+            $borrowable = $this->borrowableResolver->resolve($record->borrowable_type, $record->borrowable_id, true);
 
-            if (! $record->status->canTransitionTo(BorrowStatus::APPROVED)) {
-                throw ValidationException::withMessages([
-                    'status' => 'Only pending records can be approved.',
-                ]);
+            if ($record->status !== BorrowStatus::PENDING) {
+                throw new InvalidBorrowStatusTransitionException(
+                    $record->id,
+                    $record->status->value,
+                    BorrowStatus::BORROWED->value,
+                    'Only pending records can be approved.'
+                );
             }
 
-            if (! $equipment->is_borrowable) {
-                throw ValidationException::withMessages([
-                    'borrowable_id' => 'The selected equipment is not available for borrowing.',
-                ]);
-            }
+            $this->borrowableResolver->assertBorrowable($borrowable, $record->quantity);
 
             $record->update([
-                'status' => BorrowStatus::APPROVED,
+                'status' => BorrowStatus::BORROWED,
                 'borrowed_at' => now(),
                 'reviewed_by' => $reviewer->id,
                 'reviewed_at' => now(),
                 'rejected_reason' => null,
             ]);
 
-            $equipment->update([
-                'status' => EquipmentStatus::BORROWED,
-            ]);
-
-            $this->transaction->log(
-                $equipment,
-                $reviewer,
-                TransactionAction::BORROWED,
-                $record->quantity,
-            );
-
-            $record->user->notify(new BorrowApprovedNotification($record));
+            $this->borrowableResolver->applyBorrow($borrowable, $reviewer, $record->quantity);
 
             return $record->refresh();
         });
+
+        // Send notification outside transaction to prevent blocking on queue failures
+        $updatedRecord->user->notify(new BorrowApprovedNotification($updatedRecord));
+
+        return $updatedRecord;
     }
 }

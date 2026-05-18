@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Controllers;
 
-use App\Modules\Core\Http\Controllers\Controller;
 use App\Modules\Core\Concerns\EscapesSearchTerm;
-
+use App\Modules\Core\Http\Controllers\Controller;
+use App\Modules\Inventory\Models\UserDocument;
 use App\Modules\Inventory\Requests\UserDocument\StoreUserDocumentRequest;
 use App\Modules\Inventory\Resources\UserDocumentResource;
-use App\Modules\Inventory\Models\UserDocument;
 use App\Modules\Inventory\Services\UserDocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserDocumentController extends Controller
 {
@@ -23,6 +23,7 @@ class UserDocumentController extends Controller
     public function __construct(
         private readonly UserDocumentService $userDocumentService,
     ) {}
+
     /**
      * GET /api/user-documents
      */
@@ -32,11 +33,13 @@ class UserDocumentController extends Controller
 
         $query = UserDocument::with('user')->latest();
 
-        // Only show own documents for non-admin/non-manager
-        $user = auth('api')->user();
-        if (! $user->hasAnyPermission(['users.view', 'user_documents.view'])) {
+        $user = $request->user('api');
+        if ($user && ! $user->hasPermissionTo('documents.view', 'api')) {
             $query->where('user_id', $user->id);
-        } elseif ($request->filled('user_id')) {
+        }
+
+        // Filter by user if provided in query
+        if ($request->filled('user_id')) {
             $query->where('user_id', $request->integer('user_id'));
         }
 
@@ -84,15 +87,15 @@ class UserDocumentController extends Controller
     /**
      * GET /api/user-documents/{userDocument}/download
      */
-    public function download(UserDocument $userDocument): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function download(UserDocument $userDocument): BinaryFileResponse
     {
-        $this->authorize('view', $userDocument);
+        $this->authorize('download', $userDocument);
 
         abort_unless(Storage::disk('private')->exists($userDocument->file_path), 404, 'File not found.');
 
-        return Storage::disk('private')->download(
-            $userDocument->file_path,
-            $userDocument->title . '.' . pathinfo($userDocument->file_path, PATHINFO_EXTENSION),
+        return response()->download(
+            Storage::disk('private')->path($userDocument->file_path),
+            $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION),
         );
     }
 
@@ -104,7 +107,7 @@ class UserDocumentController extends Controller
         $this->authorize('delete', $userDocument);
 
         $this->userDocumentService->delete($userDocument);
+
         return response()->json(['message' => 'Document deleted successfully.']);
     }
-
 }

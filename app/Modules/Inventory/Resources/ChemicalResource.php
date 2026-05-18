@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Modules\Inventory\Resources;
 
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
+use App\Modules\Inventory\Models\Chemical;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Modules\Inventory\Models\Chemical
+ * @mixin Chemical
  */
 class ChemicalResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        /** @var \App\Modules\Inventory\Models\Chemical $chemical */
+        /** @var Chemical $chemical */
         $chemical = $this->resource;
 
         /** @return array<string, mixed> */

@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\DomainException;
+use App\Exceptions\StandardErrorResponse;
 use App\Modules\Core\Http\Middleware\AdminMiddleware;
 use App\Modules\Core\Http\Middleware\CacheApiResponse;
 use App\Modules\Core\Http\Middleware\ForceJsonResponse;
@@ -10,6 +12,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -25,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             app_path('Modules/Inventory/Routes/api.php'),
         ],
         commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
         health: '/up',
         apiPrefix: 'api/v1',
     )
@@ -40,6 +44,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // ____Domain Exceptions____
+        $exceptions->render(function (DomainException $e, Request $request) {
+            if ($request->is('api/*')) {
+                Log::warning('Domain exception occurred', [
+                    'exception' => get_class($e),
+                    'code' => $e->getErrorCode(),
+                    'message' => $e->getMessage(),
+                ]);
+
+                $errorResponse = StandardErrorResponse::fromDomainException($e);
+                return response()->json($errorResponse->toArray(), $e->getStatusCode());
+            }
+        });
         // ____Authentication Exceptions____
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
@@ -52,11 +69,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // ____Validation Exceptions____
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                    'errors' => $e->errors(),
-                ], 422);
+                $errorResponse = StandardErrorResponse::fromValidationErrors($e->errors());
+                return response()->json($errorResponse->toArray(), 422);
             }
         });
         // ____Model Not Found Exceptions____
@@ -99,6 +113,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
                 $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
+                
+                // Log all exceptions
+                if ($status === 500) {
+                    Log::error('Unhandled exception', [
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                }
+
                 $payload = [
                     'success' => false,
                     'message' => $status === 500

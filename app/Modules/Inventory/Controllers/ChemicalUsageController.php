@@ -6,10 +6,9 @@ namespace App\Modules\Inventory\Controllers;
 
 use App\Modules\Core\Concerns\EscapesSearchTerm;
 use App\Modules\Core\Http\Controllers\Controller;
-
+use App\Modules\Inventory\Models\ChemicalUsageLog;
 use App\Modules\Inventory\Requests\Chemical\StoreChemicalUsageLogRequest;
 use App\Modules\Inventory\Resources\ChemicalUsageLogResource;
-use App\Modules\Inventory\Models\ChemicalUsageLog;
 use App\Modules\Inventory\Services\ChemicalUsageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +17,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ChemicalUsageController extends Controller
 {
     use EscapesSearchTerm;
+
     public function __construct(
         private readonly ChemicalUsageService $chemicalUsageService,
     ) {}

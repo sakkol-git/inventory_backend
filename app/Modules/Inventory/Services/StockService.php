@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Services;
 
-use App\Enums\StockStatus;
 use App\Exceptions\InsufficientStockException;
+use App\Modules\Inventory\Enums\StockStatus;
 use App\Modules\Inventory\Models\PlantStock;
 use Illuminate\Support\Facades\DB;
 
@@ -67,6 +67,19 @@ class StockService
 
         return DB::transaction(function () use ($stock, $releaseQty): PlantStock {
             $stock->decrement('reserved_quantity', $releaseQty);
+            $this->syncStatus($stock);
+
+            return $stock->refresh();
+        });
+    }
+
+    /**
+     * Restore stock after a return.
+     */
+    public function restock(PlantStock $stock, int $quantity): PlantStock
+    {
+        return DB::transaction(function () use ($stock, $quantity): PlantStock {
+            $stock->increment('quantity', $quantity);
             $this->syncStatus($stock);
 
             return $stock->refresh();

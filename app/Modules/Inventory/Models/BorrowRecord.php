@@ -79,7 +79,12 @@ class BorrowRecord extends Model
     protected function active(Builder $query): void
     {
         $query->whereNull('returned_at')
-            ->where('status', '!=', BorrowStatus::RETURNED);
+            ->whereIn('status', [
+                BorrowStatus::PENDING,
+                BorrowStatus::APPROVED,
+                BorrowStatus::BORROWED,
+                BorrowStatus::OVERDUE,
+            ]);
     }
 
     /** Overdue: past due_at and not yet returned. */
@@ -88,7 +93,12 @@ class BorrowRecord extends Model
     {
         $query->whereNull('returned_at')
             ->whereNotNull('due_at')
-            ->where('due_at', '<', now());
+            ->where('due_at', '<', now())
+            ->whereIn('status', [
+                BorrowStatus::APPROVED,
+                BorrowStatus::BORROWED,
+                BorrowStatus::OVERDUE,
+            ]);
     }
 
     /** Pending borrow requests awaiting approval. */
@@ -103,6 +113,25 @@ class BorrowRecord extends Model
     protected function forType(Builder $query, string $type): void
     {
         $query->where('borrowable_type', $type);
+    }
+
+    /**
+     * Eager load the polymorphic borrowable relationship efficiently.
+     * Loads the borrowable model based on type to avoid N+1 queries.
+     */
+    #[Scope]
+    protected function withBorrowable(Builder $query): void
+    {
+        $query->with('borrowable');
+    }
+
+    /**
+     * Eager load all commonly used relationships.
+     */
+    #[Scope]
+    protected function withRelations(Builder $query): void
+    {
+        $query->with(['user', 'reviewer', 'borrowable']);
     }
 
     // ─── Computed ────────────────────────────────────────────────────────────

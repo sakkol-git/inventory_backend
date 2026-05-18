@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Modules\Inventory\Resources;
 
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
+use App\Modules\Inventory\Models\PlantSpecies;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Modules\Inventory\Models\PlantSpecies
+ * @mixin PlantSpecies
  */
 class PlantSpeciesResource extends JsonResource
 {
     /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
-        /** @var \App\Modules\Inventory\Models\PlantSpecies $species */
+        /** @var PlantSpecies $species */
         $species = $this->resource;
 
         return [
