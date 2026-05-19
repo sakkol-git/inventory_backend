@@ -12,27 +12,50 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $constraints = DB::select(
-            'SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME IN (?, ?) AND REFERENCED_TABLE_NAME IS NOT NULL',
-            ['plant_stocks', 'plant_species_id', 'plant_variety_id']
-        );
+        if (! Schema::hasTable('plant_stocks')) {
+            return;
+        }
 
-        foreach ($constraints as $constraint) {
-            DB::statement("ALTER TABLE plant_stocks DROP FOREIGN KEY `{$constraint->CONSTRAINT_NAME}`");
+        $speciesExists = Schema::hasColumn('plant_stocks', 'plant_species_id');
+        $varietyExists = Schema::hasColumn('plant_stocks', 'plant_variety_id');
+
+        if ($speciesExists || $varietyExists) {
+            $constraints = DB::select(
+                'SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME IN (?, ?) AND REFERENCED_TABLE_NAME IS NOT NULL',
+                ['plant_stocks', 'plant_species_id', 'plant_variety_id']
+            );
+
+            foreach ($constraints as $constraint) {
+                try {
+                    DB::statement("ALTER TABLE plant_stocks DROP FOREIGN KEY `{$constraint->CONSTRAINT_NAME}`");
+                } catch (\Exception $e) {
+                    // Ignore if the foreign key was already removed or does not exist
+                }
+            }
+
+            Schema::table('plant_stocks', function (Blueprint $table) use ($speciesExists, $varietyExists): void {
+                try {
+                    $table->dropIndex('plant_stocks_sample_idx');
+                } catch (\Exception $e) {
+                    // index may not exist or be named differently; ignore
+                }
+
+                if ($speciesExists) {
+                    $table->dropColumn('plant_species_id');
+                }
+
+                if ($varietyExists) {
+                    $table->dropColumn('plant_variety_id');
+                }
+            });
         }
 
         Schema::table('plant_stocks', function (Blueprint $table): void {
             try {
-                $table->dropIndex('plant_stocks_sample_idx');
+                $table->index(['plant_sample_id', 'status'], 'plant_stocks_sample_idx');
             } catch (\Exception $e) {
-                // index may not exist or be named differently; ignore
+                // ignore if the index already exists
             }
-
-            $table->dropColumn(['plant_species_id', 'plant_variety_id']);
-        });
-
-        Schema::table('plant_stocks', function (Blueprint $table): void {
-            $table->index(['plant_sample_id', 'status'], 'plant_stocks_sample_idx');
         });
     }
 
