@@ -11,6 +11,7 @@ namespace App\Exceptions;
 class UnauthorizedAccessException extends DomainException
 {
     protected int $statusCode = 403;
+
     protected string $errorCode = 'UNAUTHORIZED_ACCESS';
 
     public function __construct(

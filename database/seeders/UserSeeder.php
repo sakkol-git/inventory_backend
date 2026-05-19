@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        resolve(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
             'users.view',
@@ -85,8 +85,7 @@ class UserSeeder extends Seeder
 
         $labManagerPermissions = array_filter(
             $permissions,
-            fn ($permission) =>
-                str_contains($permission, '.create') ||
+            fn ($permission) => str_contains($permission, '.create') ||
                 str_contains($permission, '.edit')
         );
 
@@ -94,8 +93,7 @@ class UserSeeder extends Seeder
 
         $studentPermissions = array_filter(
             $permissions,
-            fn ($permission) =>
-                str_contains($permission, '.view')
+            fn ($permission) => str_contains($permission, '.view')
         );
 
         $studentRole->syncPermissions($studentPermissions);
@@ -154,6 +152,6 @@ class UserSeeder extends Seeder
             }
         }
 
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        resolve(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

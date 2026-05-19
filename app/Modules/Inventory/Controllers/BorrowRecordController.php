@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Inventory\Controllers;
 
 use App\Modules\Core\Http\Controllers\Controller;
+use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\Crud\CrudListService;
 use App\Modules\Inventory\Models\BorrowRecord;
 use App\Modules\Inventory\Requests\BorrowRecord\RejectBorrowRecordRequest;
@@ -188,9 +189,9 @@ class BorrowRecordController extends Controller
         return new BorrowRecordResource($record->loadMissing(['user', 'borrowable', 'reviewer']));
     }
 
-    private function canViewAll(?\App\Modules\Core\Models\User $user): bool
+    private function canViewAll(?User $user): bool
     {
-        if (! $user) {
+        if (!$user instanceof \App\Modules\Core\Models\User) {
             return false;
         }
 
@@ -198,9 +199,9 @@ class BorrowRecordController extends Controller
             || $user->hasPermissionTo('borrows.view', 'api');
     }
 
-    private function canManageBorrows(?\App\Modules\Core\Models\User $user): bool
+    private function canManageBorrows(?User $user): bool
     {
-        if (! $user) {
+        if (!$user instanceof \App\Modules\Core\Models\User) {
             return false;
         }
 

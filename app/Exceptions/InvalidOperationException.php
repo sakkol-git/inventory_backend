@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class InvalidOperationException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'INVALID_OPERATION';
 
     public function __construct(

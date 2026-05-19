@@ -13,7 +13,7 @@ use Throwable;
 readonly class StandardErrorResponse
 {
     /**
-     * @param array<string, mixed> $details Additional context details about the error
+     * @param  array<string, mixed>  $details  Additional context details about the error
      */
     public function __construct(
         public string $error,
@@ -21,8 +21,7 @@ readonly class StandardErrorResponse
         public string $message,
         public array $details = [],
         public string $timestamp = '',
-    ) {
-    }
+    ) {}
 
     /**
      * Get timestamp, generating it if empty.
@@ -63,7 +62,7 @@ readonly class StandardErrorResponse
     /**
      * Create from validation errors.
      *
-     * @param array<string, array<int, string>> $errors Validation errors keyed by field
+     * @param  array<string, array<int, string>>  $errors  Validation errors keyed by field
      */
     public static function fromValidationErrors(array $errors): self
     {

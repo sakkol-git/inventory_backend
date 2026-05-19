@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class InvalidBorrowStatusTransitionException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'INVALID_BORROW_STATUS_TRANSITION';
 
     public function __construct(

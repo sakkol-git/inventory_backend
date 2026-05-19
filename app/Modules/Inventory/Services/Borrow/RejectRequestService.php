@@ -16,9 +16,9 @@ class RejectRequestService
     /**
      * Reject a borrow request with optional reason.
      *
-     * @param User $reviewer The user rejecting the request
-     * @param BorrowRecord $record The borrow request to reject
-     * @param array{rejected_reason?: string} $data Optional rejection reason
+     * @param  User  $reviewer  The user rejecting the request
+     * @param  BorrowRecord  $record  The borrow request to reject
+     * @param  array{rejected_reason?: string}  $data  Optional rejection reason
      *
      * @throws InvalidBorrowStatusTransitionException
      */

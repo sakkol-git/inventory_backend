@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class ExceedsMaxBorrowLimitException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'EXCEEDS_MAX_BORROW_LIMIT';
 
     public function __construct(

@@ -72,7 +72,7 @@ return new class extends Migration
                 DB::statement('ALTER TABLE plant_stocks DROP CONSTRAINT plant_stocks_quantity_check');
                 DB::statement('ALTER TABLE plant_stocks DROP CONSTRAINT plant_stocks_reserved_check');
                 DB::statement('ALTER TABLE chemicals DROP CONSTRAINT chemicals_quantity_check');
-            } catch (\Exception) {
+            } catch (Exception) {
                 // Constraints may not exist
             }
         }

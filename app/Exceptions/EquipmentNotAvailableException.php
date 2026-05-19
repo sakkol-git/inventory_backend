@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class EquipmentNotAvailableException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'EQUIPMENT_NOT_AVAILABLE';
 
     public function __construct(

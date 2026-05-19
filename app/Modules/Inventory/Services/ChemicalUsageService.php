@@ -22,7 +22,7 @@ class ChemicalUsageService
     /**
      * Record a chemical usage entry, decrement stock, and log the transaction.
      *
-     * @param array{chemical_id: int, quantity_used: float, notes?: string, ...} $data
+     * @param  array{chemical_id: int, quantity_used: float, notes?: string, ...}  $data
      *
      * @throws StockCannotBeNegativeException
      */
@@ -42,7 +42,7 @@ class ChemicalUsageService
                 );
             }
 
-            $quantityUsed = (float) $data['quantity_used'];
+            $quantityUsed = $data['quantity_used'];
             $decrementQty = (int) ceil($quantityUsed);
 
             if ($decrementQty <= 0) {

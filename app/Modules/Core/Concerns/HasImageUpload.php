@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * Models using this trait MUST have `image_url` and `image_path` columns.
  *
  * @mixin Model
+ *
  * @method static void deleting(callable $callback)
  * @method string getTable()
  */
@@ -50,6 +51,6 @@ trait HasImageUpload
      */
     public static function imageFolder(): string
     {
-        return strtolower(str_replace('_', '-', (new static())->getTable()));
+        return strtolower(str_replace('_', '-', (new static)->getTable()));
     }
 }

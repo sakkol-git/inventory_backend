@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Core\Services\ImageUpload;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -27,7 +28,7 @@ class ImageStorageService
         $name = Str::ulid().'.'.$file->getClientOriginalExtension();
         $path = "images/{$folder}/{$name}";
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk($this->disk);
 
         $result = $disk->putFileAs("images/{$folder}", $file, $name, ['visibility' => 'public']);
@@ -66,7 +67,7 @@ class ImageStorageService
             return;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk($this->disk);
 
         if ($disk->exists($path)) {
@@ -80,7 +81,7 @@ class ImageStorageService
             return null;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk($this->disk);
 
         return $disk->url($path);

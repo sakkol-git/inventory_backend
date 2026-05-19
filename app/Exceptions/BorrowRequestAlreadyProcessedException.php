@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class BorrowRequestAlreadyProcessedException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'BORROW_REQUEST_ALREADY_PROCESSED';
 
     public function __construct(

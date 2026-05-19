@@ -7,6 +7,7 @@ namespace App\Exceptions;
 class InsufficientStockException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'INSUFFICIENT_STOCK';
 
     public function __construct(

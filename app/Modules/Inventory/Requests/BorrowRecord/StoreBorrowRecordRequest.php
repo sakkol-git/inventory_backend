@@ -103,16 +103,12 @@ class StoreBorrowRecordRequest extends FormRequest
                 }
             }
 
-            if ($type === 'plant_stock') {
-                if ($borrowable->available_quantity < $quantity) {
-                    $v->errors()->add('quantity', 'Insufficient plant stock available.');
-                }
+            if ($type === 'plant_stock' && $borrowable->available_quantity < $quantity) {
+                $v->errors()->add('quantity', 'Insufficient plant stock available.');
             }
 
-            if ($type === 'plant_sample' && $borrowable->stock_quantity !== null) {
-                if ($borrowable->stock_quantity < $quantity) {
-                    $v->errors()->add('quantity', 'Insufficient plant sample quantity available.');
-                }
+            if ($type === 'plant_sample' && $borrowable->stock_quantity !== null && $borrowable->stock_quantity < $quantity) {
+                $v->errors()->add('quantity', 'Insufficient plant sample quantity available.');
             }
         });
     }

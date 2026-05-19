@@ -54,6 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ]);
 
                 $errorResponse = StandardErrorResponse::fromDomainException($e);
+
                 return response()->json($errorResponse->toArray(), $e->getStatusCode());
             }
         });
@@ -70,6 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
                 $errorResponse = StandardErrorResponse::fromValidationErrors($e->errors());
+
                 return response()->json($errorResponse->toArray(), 422);
             }
         });
@@ -113,7 +115,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
                 $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
-                
+
                 // Log all exceptions
                 if ($status === 500) {
                     Log::error('Unhandled exception', [

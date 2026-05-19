@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Core\Services\ImageUpload;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,8 +22,6 @@ use Illuminate\Support\Facades\Storage;
  */
 class ImageUploadService
 {
-    private const DISK = 'public';
-
     public function __construct(
         private readonly ImagePayloadPreparerService $payloadPreparer,
         private readonly ImageStorageService $storage,
@@ -97,7 +96,7 @@ class ImageUploadService
         if ($imagePath) {
             $diskName = env('IMAGE_STORAGE_DISK', config('filesystems.default'));
 
-            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            /** @var FilesystemAdapter $disk */
             $disk = Storage::disk($diskName);
 
             return $disk->url($imagePath);

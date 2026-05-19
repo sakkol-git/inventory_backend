@@ -20,8 +20,7 @@ class RequestBorrowService
     /**
      * Create a borrow request for equipment, chemical, or plant sample.
      *
-     * @param array{borrowable_id: int, quantity?: int, due_at?: string, notes?: string} $data
-     *
+     * @param  array{borrowable_id: int, quantity?: int, due_at?: string, notes?: string}  $data
      */
     public function requestBorrow(User $user, array $data): BorrowRecord
     {
@@ -54,7 +53,7 @@ class RequestBorrowService
     /**
      * Direct borrow for privileged users (skips pending state).
      *
-     * @param array{borrowable_id: int, quantity?: int, due_at?: string, notes?: string} $data
+     * @param  array{borrowable_id: int, quantity?: int, due_at?: string, notes?: string}  $data
      */
     public function borrow(User $user, array $data): BorrowRecord
     {

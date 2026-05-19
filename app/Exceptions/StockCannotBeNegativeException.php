@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class StockCannotBeNegativeException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'STOCK_CANNOT_BE_NEGATIVE';
 
     public function __construct(

@@ -15,6 +15,7 @@ use Illuminate\Validation\Rule;
 class StoreEquipmentRequest extends FormRequest
 {
     use HasImageValidation;
+
     public function authorize(): bool
     {
         return true;

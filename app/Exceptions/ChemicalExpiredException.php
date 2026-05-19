@@ -10,6 +10,7 @@ namespace App\Exceptions;
 class ChemicalExpiredException extends DomainException
 {
     protected int $statusCode = 422;
+
     protected string $errorCode = 'CHEMICAL_EXPIRED';
 
     public function __construct(

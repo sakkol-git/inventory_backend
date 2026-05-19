@@ -27,7 +27,7 @@ class PlantStockController extends Controller
             modelClass: PlantStock::class,
             request: $request,
             perPage: 10,
-            with: [ 'sample'],
+            with: ['sample'],
             filterMap: [
                 'sample_id' => 'plant_sample_id',
                 'status' => 'status',
