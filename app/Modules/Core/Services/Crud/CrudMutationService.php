@@ -24,9 +24,9 @@ class CrudMutationService
         User $user,
         ?Model $logTarget = null,
     ): Model {
-        return DB::transaction(function () use ($modelClass, $data, $user, $logTarget): Model {
-            $payload = $this->imageService->prepareDataForPersistence($data, $modelClass);
+        $payload = $this->imageService->prepareDataForPersistence($data, $modelClass);
 
+        return DB::transaction(function () use ($modelClass, $payload, $user, $logTarget): Model {
             /** @var Model $instance */
             $instance = $modelClass::create($payload);
 
@@ -42,9 +42,9 @@ class CrudMutationService
         User $user,
         ?Model $logTarget = null,
     ): Model {
-        return DB::transaction(function () use ($instance, $data, $user, $logTarget): Model {
-            $payload = $this->imageService->prepareDataForPersistence($data, $instance, $instance);
+        $payload = $this->imageService->prepareDataForPersistence($data, $instance, $instance);
 
+        return DB::transaction(function () use ($instance, $payload, $user, $logTarget): Model {
             $instance->update($payload);
             $this->logMutation($instance, $user, TransactionAction::UPDATED, $logTarget);
 

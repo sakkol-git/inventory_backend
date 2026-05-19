@@ -21,13 +21,18 @@ class ImageStorageService
     public function storeFile(UploadedFile $file, string $folder): string
     {
         $name = Str::ulid().'.'.$file->getClientOriginalExtension();
+        $path = "images/{$folder}/{$name}";
 
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk($this->disk);
 
-        $disk->putFileAs("images/{$folder}", $file, $name, ['visibility' => 'public']);
+        $result = $disk->putFileAs("images/{$folder}", $file, $name, ['visibility' => 'public']);
 
-        return "images/{$folder}/{$name}";
+        if ($result === false || ! $disk->exists($path)) {
+            throw new \RuntimeException("Image upload failed for disk {$this->disk} path {$path}");
+        }
+
+        return $path;
     }
 
     public function deleteModelImagePath(?Model $existing): void
