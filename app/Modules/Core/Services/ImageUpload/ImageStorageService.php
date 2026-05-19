@@ -20,6 +20,10 @@ class ImageStorageService
 
     public function storeFile(UploadedFile $file, string $folder): string
     {
+        if ($this->disk === 's3') {
+            $this->assertS3CredentialsConfigured();
+        }
+
         $name = Str::ulid().'.'.$file->getClientOriginalExtension();
         $path = "images/{$folder}/{$name}";
 
@@ -33,6 +37,18 @@ class ImageStorageService
         }
 
         return $path;
+    }
+
+    private function assertS3CredentialsConfigured(): void
+    {
+        $key = config('filesystems.disks.s3.key');
+        $secret = config('filesystems.disks.s3.secret');
+
+        if (! is_string($key) || $key === '' || ! is_string($secret) || $secret === '') {
+            throw new \RuntimeException(
+                'S3 storage is configured for image uploads, but AWS_ACCESS_KEY_ID and/or AWS_SECRET_ACCESS_KEY are not set.'
+            );
+        }
     }
 
     public function deleteModelImagePath(?Model $existing): void
