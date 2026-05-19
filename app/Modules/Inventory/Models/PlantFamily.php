@@ -24,6 +24,8 @@ class PlantFamily extends Model
 
     protected $fillable = [
         'name',
+        'image_url',
+        'image_path',
     ];
 
     // ─── Relationships ───────────────────────────────────────────────────────

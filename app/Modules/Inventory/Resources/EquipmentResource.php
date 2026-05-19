@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Resources;
 
+use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use App\Modules\Inventory\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -34,7 +35,7 @@ class EquipmentResource extends JsonResource
             'purchase_date' => $equipment->purchase_date?->format('Y-m-d'),
             'purchase_price' => $equipment->purchase_price,
             'description' => $equipment->description,
-            'image_url' => $equipment->image_url,
+            'image_url' => ImageUploadService::resolveImageUrl($equipment->image_path, $equipment->image_url),
             'is_borrowable' => $equipment->is_borrowable,
             'created_at' => $equipment->created_at?->toIso8601String(),
             'updated_at' => $equipment->updated_at?->toIso8601String(),

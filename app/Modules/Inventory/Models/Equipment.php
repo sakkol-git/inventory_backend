@@ -6,6 +6,7 @@ namespace App\Modules\Inventory\Models;
 
 use App\Modules\Core\Concerns\EscapesSearchTerm;
 use App\Modules\Core\Concerns\HasActivityLogging;
+use App\Modules\Core\Concerns\HasImageUpload;
 use App\Modules\Core\Concerns\HasTransactions;
 use App\Modules\Inventory\Enums\EquipmentCategory;
 use App\Modules\Inventory\Enums\EquipmentCondition;
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
 {
-    use EscapesSearchTerm, HasActivityLogging, HasFactory, HasTransactions, SoftDeletes;
+    use EscapesSearchTerm, HasActivityLogging, HasFactory, HasImageUpload, HasTransactions, SoftDeletes;
 
     protected $table = 'equipment';
 
@@ -36,6 +37,7 @@ class Equipment extends Model
         'purchase_price',
         'description',
         'image_url',
+        'image_path',
     ];
 
     protected function casts(): array

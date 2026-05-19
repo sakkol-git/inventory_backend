@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Requests\Equipment;
 
+use App\Modules\Core\Concerns\HasImageValidation;
 use App\Modules\Inventory\Enums\EquipmentCategory;
 use App\Modules\Inventory\Enums\EquipmentCondition;
 use App\Modules\Inventory\Enums\EquipmentStatus;
@@ -13,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class StoreEquipmentRequest extends FormRequest
 {
+    use HasImageValidation;
     public function authorize(): bool
     {
         return true;
@@ -34,7 +36,7 @@ class StoreEquipmentRequest extends FormRequest
             'purchase_date' => ['nullable', 'date'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'description' => ['nullable', 'string'],
-            'image_url' => ['nullable', 'url', 'max:2048'],
+            ...$this->imageRules(),
         ];
     }
 }

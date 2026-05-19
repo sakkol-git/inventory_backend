@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Inventory\Models;
 
+use App\Modules\Core\Concerns\HasImageUpload;
 use App\Modules\Core\Concerns\HasTransactions;
 use App\Modules\Core\Models\User;
 use Database\Factories\AchievementFactory;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Achievement extends Model
 {
     /** @use HasFactory<AchievementFactory> */
-    use HasFactory, HasTransactions;
+    use HasFactory, HasImageUpload, HasTransactions;
 
     protected $table = 'achievements';
 
