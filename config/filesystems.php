@@ -30,36 +30,36 @@ return [
 
     'disks' => [
 
-        'local' => [
-            'driver' => 'local',
-            'root' => storage_path('app/private'),
-            'serve' => true,
-            'throw' => false,
-            'report' => false,
-        ],
+        // 'local' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/private'),
+        //     'serve' => true,
+        //     'throw' => false,
+        //     'report' => false,
+        // ],
 
-        'private' => [
-            'driver' => 'local',
-            'root' => storage_path('app/private'),
-            'url' => env('APP_URL').'/private-storage',
-            'visibility' => 'private',
-            // For production S3:
-            // 'driver' => 's3',
-            // 'key' => env('AWS_ACCESS_KEY_ID'),
-            // 'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            // 'region' => env('AWS_DEFAULT_REGION'),
-            // 'bucket' => env('AWS_PRIVATE_BUCKET'),
-            // 'visibility' => 'private',
-        ],
+        // 'private' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/private'),
+        //     'url' => env('APP_URL').'/private-storage',
+        //     'visibility' => 'private',
+        //     // For production S3:
+        //     // 'driver' => 's3',
+        //     // 'key' => env('AWS_ACCESS_KEY_ID'),
+        //     // 'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        //     // 'region' => env('AWS_DEFAULT_REGION'),
+        //     // 'bucket' => env('AWS_PRIVATE_BUCKET'),
+        //     // 'visibility' => 'private',
+        // ],
 
-        'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
-            'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
-        ],
+        // 'public' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/public'),
+        //     'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+        //     'visibility' => 'public',
+        //     'throw' => false,
+        //     'report' => false,
+        // ],
 
         's3' => [
             'driver' => 's3',
