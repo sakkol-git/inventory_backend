@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Storage;
  */
 class ImageUploadService
 {
+    private const DISK = 'public';
+
     public function __construct(
         private readonly ImagePayloadPreparerService $payloadPreparer,
         private readonly ImageStorageService $storage,
@@ -93,7 +95,10 @@ class ImageUploadService
     public static function resolveImageUrl(?string $imagePath, ?string $imageUrl): ?string
     {
         if ($imagePath) {
-            return Storage::url($imagePath);
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk(self::DISK);
+
+            return $disk->url($imagePath);
         }
 
         return $imageUrl;

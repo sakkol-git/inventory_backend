@@ -44,6 +44,13 @@ class ImageStorageService
 
     public function resolveUploadedPathUrl(?string $path): ?string
     {
-        return $path ? Storage::url($path) : null;
+        if (! $path) {
+            return null;
+        }
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk(self::DISK);
+
+        return $disk->url($path);
     }
 }
