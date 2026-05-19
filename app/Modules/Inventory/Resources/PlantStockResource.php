@@ -27,8 +27,6 @@ class PlantStockResource extends JsonResource
             ],
             // Relationships — only present when eager-loaded (prevents N+1)
             'relations' => [
-                'species' => new PlantSpeciesResource($this->whenLoaded('species')),
-                'variety' => new PlantVarietyResource($this->whenLoaded('variety')),
                 'sample' => new PlantSampleResource($this->whenLoaded('sample')),
             ],
             'created_at' => $this->created_at?->toIso8601String(),
