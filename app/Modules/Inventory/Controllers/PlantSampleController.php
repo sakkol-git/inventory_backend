@@ -28,10 +28,10 @@ class PlantSampleController extends Controller
             modelClass: PlantSample::class,
             request: $request,
             perPage: 10,
-            with: ['plantSpecies', 'plantVariety'],
+            with: ['plantVariety'],
             filterMap: [
+                'variety_id' => 'plant_variety_id',
                 'status' => 'status',
-                'species_id' => 'plant_species_id',
             ],
         );
 
