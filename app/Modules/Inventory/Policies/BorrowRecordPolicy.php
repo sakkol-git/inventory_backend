@@ -25,7 +25,7 @@ class BorrowRecordPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('borrow.create', 'api');
+        return $user->hasPermissionTo('borrows.create', 'api');
     }
 
     public function approve(User $user, BorrowRecord $record): bool
