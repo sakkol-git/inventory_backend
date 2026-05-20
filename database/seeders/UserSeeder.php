@@ -45,6 +45,7 @@ class UserSeeder extends Seeder
             'documents.create',
             'documents.edit',
             'documents.delete',
+            'documents.download',
 
             'transactions.view',
             'reports.view',
