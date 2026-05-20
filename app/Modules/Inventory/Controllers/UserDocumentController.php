@@ -91,23 +91,24 @@ class UserDocumentController extends Controller
     {
         $this->authorize('download', $userDocument);
 
-        $stream = Storage::disk('private')->readStream($userDocument->file_path);
-
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('private');
+        $stream = $disk->readStream($userDocument->file_path);
         abort_unless(is_resource($stream), 404, 'File not found.');
 
         $filename = $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION);
-        $filePath = Storage::disk('private')->path($userDocument->file_path);
-        $mimeType = mime_content_type($filePath) ?: 'application/pdf';
+        $mimeType = $disk->mimeType($userDocument->file_path) ?: 'application/pdf';
 
         return response()->streamDownload(function () use ($stream): void {
-            while (! feof($stream)) {
-                echo fread($stream, 8192);
+            try {
+                while (! feof($stream)) {
+                    echo fread($stream, 8192);
+                }
+            } finally {
+                fclose($stream);
             }
-
-            fclose($stream);
         }, $filename, [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
