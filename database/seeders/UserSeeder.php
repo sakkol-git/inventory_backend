@@ -99,6 +99,7 @@ class UserSeeder extends Seeder
             $permissions,
             fn ($permission) => str_contains($permission, '.create') ||
                 str_contains($permission, '.edit') ||
+                str_contains($permission, 'borrows.view') ||
                 str_contains($permission, 'borrows.create') ||
                 str_contains($permission, 'borrows.approve') ||
                 str_contains($permission, 'borrows.reject') ||
@@ -112,7 +113,6 @@ class UserSeeder extends Seeder
             $permissions,
             fn ($permission) => str_contains($permission, '.view') ||
                 str_contains($permission, 'borrows.create') ||
-                str_contains($permission, 'borrows.return') ||
                 str_contains($permission, 'documents.download')
         );
 

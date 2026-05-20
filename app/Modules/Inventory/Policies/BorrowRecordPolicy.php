@@ -18,7 +18,6 @@ class BorrowRecordPolicy
     public function view(User $user, BorrowRecord $record): bool
     {
         return $user->id === $record->user_id 
-            && $user->hasPermissionTo('borrows.view', 'api')
             || $this->canManage($user);
 ;
     }
@@ -48,7 +47,7 @@ class BorrowRecordPolicy
     {
         $active = [BorrowStatus::APPROVED, BorrowStatus::BORROWED, BorrowStatus::OVERDUE];
 
-        if (in_array($record->status, $active, true) && $user->id === $record->user_id && $user->hasPermissionTo('borrow.return', 'api')) {
+        if (in_array($record->status, $active, true) && $user->id === $record->user_id) {
             return true;
         }
 
