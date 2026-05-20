@@ -63,6 +63,25 @@ return [
         //     'report' => false,
         // ],
 
+        'private' => env('PRIVATE_FILESYSTEM_DRIVER', env('APP_ENV') === 'production' ? 's3' : 'local') === 's3' ? [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_PRIVATE_BUCKET', env('AWS_BUCKET')),
+            'url' => env('AWS_PRIVATE_URL', env('AWS_URL')),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ] : [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

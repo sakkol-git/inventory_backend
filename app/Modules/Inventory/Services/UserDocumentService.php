@@ -8,24 +8,39 @@ use App\Modules\Inventory\Models\UserDocument;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class UserDocumentService
 {
+    public function __construct(
+        private readonly FileUploadService $fileUploadService,
+    ) {}
+
     /**
      * Store a new user document and persist the uploaded file.
      */
     public function create(UploadedFile $file, array $data, int $userId): UserDocument
     {
-        $path = $file->store('documents', 'private');
+        $path = $this->fileUploadService->validateAndStore(
+            file: $file,
+            context: 'document',
+            folder: 'documents',
+        );
 
-        return DB::transaction(fn () => UserDocument::create([
-            'user_id' => $userId,
-            'title' => $data['title'],
-            'file_path' => $path,
-            'file_type' => $data['file_type'] ?? 'other',
-            'file_size' => $file->getSize(),
-            'description' => $data['description'] ?? null,
-        ]));
+        try {
+            return DB::transaction(fn () => UserDocument::create([
+                'user_id' => $userId,
+                'title' => $data['title'],
+                'file_path' => $path,
+                'file_type' => $data['file_type'] ?? 'document',
+                'file_size' => $file->getSize(),
+                'description' => $data['description'] ?? null,
+            ]));
+        } catch (Throwable $throwable) {
+            Storage::disk('private')->delete($path);
+
+            throw $throwable;
+        }
     }
 
     /**
@@ -34,10 +49,6 @@ class UserDocumentService
     public function delete(UserDocument $document): void
     {
         DB::transaction(function () use ($document): void {
-            if (Storage::disk('private')->exists($document->file_path)) {
-                Storage::disk('private')->delete($document->file_path);
-            }
-
             $document->delete();
         });
     }

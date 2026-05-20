@@ -20,7 +20,7 @@ class StoreUserDocumentRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'file' => ['required', 'file', 'max:10240'],
-            'file_type' => ['nullable', 'string', 'max:50'],
+            'file_type' => ['nullable', 'string', 'max:50', 'in:document,pdf,image,certificate,other'],
             'description' => ['nullable', 'string'],
         ];
     }

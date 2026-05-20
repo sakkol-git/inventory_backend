@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserDocumentController extends Controller
 {
@@ -87,16 +87,21 @@ class UserDocumentController extends Controller
     /**
      * GET /api/user-documents/{userDocument}/download
      */
-    public function download(UserDocument $userDocument): BinaryFileResponse
+    public function download(UserDocument $userDocument): StreamedResponse
     {
         $this->authorize('download', $userDocument);
 
-        abort_unless(Storage::disk('private')->exists($userDocument->file_path), 404, 'File not found.');
+        $stream = Storage::disk('private')->readStream($userDocument->file_path);
 
-        return response()->download(
-            Storage::disk('private')->path($userDocument->file_path),
-            $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION),
-        );
+        abort_unless(is_resource($stream), 404, 'File not found.');
+
+        return response()->streamDownload(function () use ($stream): void {
+            while (! feof($stream)) {
+                echo fread($stream, 8192);
+            }
+
+            fclose($stream);
+        }, $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION));
     }
 
     /**

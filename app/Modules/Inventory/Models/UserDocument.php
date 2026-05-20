@@ -37,7 +37,7 @@ class UserDocument extends Model
 
     protected static function booted(): void
     {
-        static::forceDeleting(function (UserDocument $document): void {
+        static::deleting(function (UserDocument $document): void {
             if ($document->file_path) {
                 Storage::disk('private')->delete($document->file_path);
             }

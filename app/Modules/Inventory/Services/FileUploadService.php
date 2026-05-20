@@ -1,8 +1,8 @@
 <?php
 
-// app/Modules/Core/Services/FileUploadService.php
+// app/Modules/Inventory/Services/FileUploadService.php
 
-namespace App\Modules\Core\Services;
+namespace App\Modules\Inventory\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -49,7 +49,7 @@ class FileUploadService
         string $disk = 'private'
     ): string {
         // 1. Detect real MIME type from file content (not extension or client header)
-        $realMime = mime_content_type($file->getRealPath());
+        $realMime = mime_content_type($file->getRealPath()) ?: $file->getMimeType() ?: 'application/octet-stream';
         // 2. Hard reject forbidden MIME types
         if (in_array($realMime, self::FORBIDDEN_MIMES, true)) {
             throw ValidationException::withMessages([

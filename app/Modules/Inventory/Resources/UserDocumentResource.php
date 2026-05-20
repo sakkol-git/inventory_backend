@@ -15,10 +15,10 @@ class UserDocumentResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'title' => $this->title,
-            'file_path' => $this->file_path,
             'file_type' => $this->file_type,
             'file_size' => $this->file_size,
             'description' => $this->description,
+            'download_url' => route('user-documents.download', ['userDocument' => $this->id]),
             'user' => [
                 'id' => $this->whenLoaded('user', fn () => $this->user->id),
                 'name' => $this->whenLoaded('user', fn () => $this->user->name),
