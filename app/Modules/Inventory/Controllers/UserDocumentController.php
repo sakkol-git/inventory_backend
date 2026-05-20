@@ -95,13 +95,20 @@ class UserDocumentController extends Controller
 
         abort_unless(is_resource($stream), 404, 'File not found.');
 
+        $filename = $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION);
+        $filePath = Storage::disk('private')->path($userDocument->file_path);
+        $mimeType = mime_content_type($filePath) ?: 'application/pdf';
+
         return response()->streamDownload(function () use ($stream): void {
             while (! feof($stream)) {
                 echo fread($stream, 8192);
             }
 
             fclose($stream);
-        }, $userDocument->title.'.'.pathinfo($userDocument->file_path, PATHINFO_EXTENSION));
+        }, $filename, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 
     /**
