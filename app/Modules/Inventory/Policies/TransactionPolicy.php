@@ -13,11 +13,6 @@ class TransactionPolicy
      * Determine if the user can view any transactions.
      * Only users with 'transactions.view' permission can see all transactions.
      */
-    public function viewAny(User $user): bool
-    {
-        return $user->hasPermissionTo('transactions.view', 'api');
-    }
-
     /**
      * Determine if the user can view a specific transaction.
      * Users can view their own transactions or admins can view any.

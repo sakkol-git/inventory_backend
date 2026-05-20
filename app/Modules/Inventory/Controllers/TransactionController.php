@@ -17,7 +17,7 @@ class TransactionController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Transaction::class);
+        $this->authorize('view', Transaction::class);
         $query = Transaction::with(['user', 'transactionable'])
             ->latest();
 
