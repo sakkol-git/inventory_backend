@@ -19,7 +19,6 @@ class BorrowRecordPolicy
     {
         return $user->id === $record->user_id 
             || $this->canManage($user);
-;
     }
 
     public function create(User $user): bool
