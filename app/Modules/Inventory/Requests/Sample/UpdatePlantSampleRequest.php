@@ -42,9 +42,9 @@ class UpdatePlantSampleRequest extends FormRequest
 
             // Relationships
             'plant_variety_id' => ['nullable', 'integer', 'exists:plant_varieties,id'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
 
             // Ownership & Origin Info
-            'owner_name' => ['nullable', 'string', 'max:255'],
             'department' => ['nullable', 'string', 'max:255'],
             'origin_location' => ['nullable', 'string', 'max:255'],
 

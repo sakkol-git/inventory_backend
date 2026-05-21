@@ -30,10 +30,8 @@ class PlantSample extends Model
     protected $fillable = [
         'plant_variety_id',
         'user_id',
-        'contributor_id',
         'sample_name',
         'sample_code',
-        'user_id',
         'department',
         'origin_location',
         'brought_at',
