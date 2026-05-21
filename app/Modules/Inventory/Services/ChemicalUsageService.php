@@ -62,6 +62,8 @@ class ChemicalUsageService
                     'Insufficient chemical stock available.'
                 );
             }
+            
+            $data['experiment_name'] = 'use';
 
             $log = ChemicalUsageLog::create($data);
 
@@ -96,26 +98,28 @@ class ChemicalUsageService
             }
 
             $quantityUsed = $data['quantity_used'];
-            $decrementQty = (int) ceil($quantityUsed);
+            $incrementQty = (int) ceil($quantityUsed);
 
-            if ($decrementQty <= 0) {
+            if ($incrementQty <= 0) {
                 throw new StockCannotBeNegativeException(
                     'Chemical',
                     $chemical->quantity,
-                    -$decrementQty,
+                    -$incrementQty,
                     'Quantity used must be greater than zero.'
                 );
             }
 
+            $data['experiment_name'] = 'add';
+
             $log = ChemicalUsageLog::create($data);
 
             // Increment chemical stock
-            $chemical->increment('quantity', $decrementQty);
+            $chemical->increment('quantity', $incrementQty);
 
             $this->transactionService->log(
                 item: $chemical,
                 user: $user,
-                action: TransactionAction::CONSUMED,
+                action: TransactionAction::ADDED,
                 quantity: $quantityUsed,
             );
 

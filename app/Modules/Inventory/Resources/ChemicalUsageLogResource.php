@@ -19,6 +19,7 @@ class ChemicalUsageLogResource extends JsonResource
             'purpose' => $this->purpose,
             'used_at' => $this->used_at?->toIso8601String(),
             'notes' => $this->notes,
+            'experiment_name' => $this->experiment_name,
             'user' => [
                 'id' => $this->whenLoaded('user', fn () => $this->user->id),
                 'name' => $this->whenLoaded('user', fn () => $this->user->name),

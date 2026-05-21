@@ -22,7 +22,6 @@ class StoreChemicalUsageLogRequest extends FormRequest
             'quantity_used' => ['required', 'numeric', 'min:0.01'],
             'unit' => ['nullable', 'string', 'max:20'],
             'purpose' => ['required', 'string', 'max:255'],
-            'experiment_name' => ['nullable', 'string', 'max:255'],
             'used_at' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
         ];

@@ -60,7 +60,7 @@ class ChemicalUsageController extends Controller
             user: $request->user(),
         );
 
-        $log->load(['chemical', 'user']);
+        $log->load(['chemical', 'user', 'action']);
 
         return (new ChemicalUsageLogResource($log))
             ->response()
@@ -79,7 +79,7 @@ class ChemicalUsageController extends Controller
             user: $request->user(),
         );
 
-        $log->load(['chemical', 'user']);
+        $log->load(['chemical', 'user', 'action']);
 
         return (new ChemicalUsageLogResource($log))
             ->response()
