@@ -31,6 +31,10 @@ class UserSeeder extends Seeder
             'chemicals.edit',
             'chemicals.delete',
 
+            'chemical-usage-logs.view',
+            'chemical-usage-logs.create',
+            
+
             'equipment.view',
             'equipment.create',
             'equipment.edit',

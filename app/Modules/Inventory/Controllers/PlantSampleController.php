@@ -28,7 +28,7 @@ class PlantSampleController extends Controller
             modelClass: PlantSample::class,
             request: $request,
             perPage: 10,
-            with: ['plantVariety'],
+            with: ['plantVariety', 'contributor', 'stocks'],
             filterMap: [
                 'variety_id' => 'plant_variety_id',
                 'status' => 'status',
@@ -56,6 +56,8 @@ class PlantSampleController extends Controller
             user: auth('api')->user(),
         );
 
+        $plantSample->loadMissing(['plantVariety', 'contributor', 'stocks']);
+
         return (new PlantSampleResource($plantSample))
             ->response()
             ->setStatusCode(201);
@@ -67,6 +69,8 @@ class PlantSampleController extends Controller
     public function show(PlantSample $plantSample): PlantSampleResource
     {
         $this->authorize('view', $plantSample);
+
+        $plantSample->loadMissing(['plantVariety', 'contributor', 'stocks']);
 
         return new PlantSampleResource($plantSample);
     }
@@ -88,6 +92,8 @@ class PlantSampleController extends Controller
             data: $data,
             user: auth('api')->user(),
         );
+
+        $updatedSample->loadMissing(['plantVariety', 'contributor', 'stocks']);
 
         return new PlantSampleResource($updatedSample);
     }
