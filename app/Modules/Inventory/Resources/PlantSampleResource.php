@@ -8,6 +8,7 @@ use App\Modules\Core\Resources\UserResource;
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use App\Modules\Inventory\Models\PlantSample;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -34,7 +35,9 @@ class PlantSampleResource extends JsonResource
             'relationships' => [
                 'variety' => new PlantVarietyResource($this->whenLoaded('plantVariety')),
                 'contributor' => new UserResource($this->whenLoaded('contributor')),
-                'stocks' => PlantStockResource::collection($this->whenLoaded('stocks')),
+                'stocks' => $this->resource->relationLoaded('stocks')
+                    ? PlantStockResource::collection($this->resource->getRelation('stocks'))
+                    : new MissingValue,
             ],
 
             'details' => [
