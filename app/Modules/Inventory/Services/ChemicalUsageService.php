@@ -63,7 +63,6 @@ class ChemicalUsageService
                 );
             }
             
-            $data['experiment_name'] = 'use';
 
             $log = ChemicalUsageLog::create($data);
 
@@ -109,7 +108,6 @@ class ChemicalUsageService
                 );
             }
 
-            $data['experiment_name'] = 'add';
 
             $log = ChemicalUsageLog::create($data);
 
