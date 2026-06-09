@@ -20,12 +20,14 @@ use App\Modules\Inventory\Models\UserDocument;
 use App\Modules\Inventory\Policies\AchievementPolicy;
 use App\Modules\Inventory\Policies\BorrowRecordPolicy;
 use App\Modules\Inventory\Policies\ChemicalPolicy;
+use App\Modules\Inventory\Policies\ChemicalUsagePolicy;
 use App\Modules\Inventory\Policies\EquipmentPolicy;
 use App\Modules\Inventory\Policies\PlantSamplePolicy;
 use App\Modules\Inventory\Policies\PlantSpeciesPolicy;
 use App\Modules\Inventory\Policies\PlantStockPolicy;
 use App\Modules\Inventory\Policies\PlantVarietyPolicy;
 use App\Modules\Inventory\Policies\TransactionPolicy;
+use App\Modules\Inventory\Policies\UserDocumentPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -81,6 +83,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Achievement::class, AchievementPolicy::class);
         Gate::policy(Transaction::class, TransactionPolicy::class);
         Gate::policy(BorrowRecord::class, BorrowRecordPolicy::class);
+        Gate::policy(ChemicalUsageLog::class, ChemicalUsagePolicy::class);
+        Gate::policy(UserDocument::class, UserDocumentPolicy::class);
 
         // Super-admin bypass: users with the spatie 'admin' role can do anything.
         Gate::before(function ($user) {
@@ -188,14 +192,14 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
+        Password::defaults(fn (): ?Password => (app()->isProduction() || app()->runningUnitTests())
             ? Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-            : null
+            : Password::min(8)
         );
     }
 }

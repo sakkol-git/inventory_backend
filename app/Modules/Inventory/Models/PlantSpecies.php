@@ -9,7 +9,6 @@ use App\Modules\Core\Concerns\HasActivityLogging;
 use App\Modules\Core\Concerns\HasImageUpload;
 use App\Modules\Core\Concerns\HasTransactions;
 use App\Modules\Inventory\Enums\PlantGrowthType;
-use App\Modules\Research\Models\Experiment;
 use Database\Factories\PlantSpeciesFactory;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,11 +50,6 @@ class PlantSpecies extends Model
     {
         return $this->hasMany(PlantVariety::class, 'plant_species_id');
     }
-
-    // public function experiments(): HasMany
-    // {
-    //     return $this->hasMany(Experiment::class, 'plant_species_id');
-    // }
 
     // ─── Scopes ──────────────────────────────────────────────────────────────
 

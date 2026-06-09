@@ -6,16 +6,12 @@ namespace App\Modules\Core\Controllers;
 
 use App\Modules\Core\Concerns\EscapesSearchTerm;
 use App\Modules\Core\Http\Controllers\Controller;
-// use App\Modules\Business\Models\Client;
-// use App\Modules\Business\Models\Contract;
 use App\Modules\Inventory\Models\Chemical;
 use App\Modules\Inventory\Models\Equipment;
 use App\Modules\Inventory\Models\PlantSample;
 use App\Modules\Inventory\Models\PlantSpecies;
 use App\Modules\Inventory\Models\PlantStock;
 use App\Modules\Inventory\Models\PlantVariety;
-// use App\Modules\Research\Models\Experiment;
-// use App\Modules\Research\Models\Protocol;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

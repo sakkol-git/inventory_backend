@@ -21,14 +21,16 @@ class StockService
      */
     public function consume(PlantStock $stock, int $quantity): PlantStock
     {
-        if ($stock->available_quantity < $quantity) {
-            throw new InsufficientStockException(
-                requested: $quantity,
-                available: $stock->available_quantity,
-            );
-        }
-
         return DB::transaction(function () use ($stock, $quantity): PlantStock {
+            $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
+            
+            if ($stock->available_quantity < $quantity) {
+                throw new InsufficientStockException(
+                    requested: $quantity,
+                    available: $stock->available_quantity,
+                );
+            }
+
             $stock->decrement('quantity', $quantity);
             $this->syncStatus($stock);
 
@@ -43,14 +45,16 @@ class StockService
      */
     public function reserve(PlantStock $stock, int $quantity): PlantStock
     {
-        if ($stock->available_quantity < $quantity) {
-            throw new InsufficientStockException(
-                requested: $quantity,
-                available: $stock->available_quantity,
-            );
-        }
-
         return DB::transaction(function () use ($stock, $quantity): PlantStock {
+            $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
+            
+            if ($stock->available_quantity < $quantity) {
+                throw new InsufficientStockException(
+                    requested: $quantity,
+                    available: $stock->available_quantity,
+                );
+            }
+
             $stock->increment('reserved_quantity', $quantity);
             $this->syncStatus($stock);
 
@@ -63,9 +67,10 @@ class StockService
      */
     public function release(PlantStock $stock, int $quantity): PlantStock
     {
-        $releaseQty = min($quantity, $stock->reserved_quantity);
-
-        return DB::transaction(function () use ($stock, $releaseQty): PlantStock {
+        return DB::transaction(function () use ($stock, $quantity): PlantStock {
+            $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
+            $releaseQty = min($quantity, $stock->reserved_quantity);
+            
             $stock->decrement('reserved_quantity', $releaseQty);
             $this->syncStatus($stock);
 
@@ -79,6 +84,7 @@ class StockService
     public function restock(PlantStock $stock, int $quantity): PlantStock
     {
         return DB::transaction(function () use ($stock, $quantity): PlantStock {
+            $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
             $stock->increment('quantity', $quantity);
             $this->syncStatus($stock);
 

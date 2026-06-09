@@ -53,8 +53,12 @@ return new class extends Migration
         });
 
         Schema::table('plant_stocks', function (Blueprint $table) {
-            $table->index('plant_species_id');
-            $table->index('plant_variety_id');
+            if (Schema::hasColumn('plant_stocks', 'plant_species_id')) {
+                $table->index('plant_species_id');
+            }
+            if (Schema::hasColumn('plant_stocks', 'plant_variety_id')) {
+                $table->index('plant_variety_id');
+            }
             $table->index('status');
         });
     }
@@ -108,8 +112,12 @@ return new class extends Migration
         });
 
         Schema::table('plant_stocks', function (Blueprint $table) {
-            $table->dropIndex(['plant_species_id']);
-            $table->dropIndex(['plant_variety_id']);
+            if (Schema::hasColumn('plant_stocks', 'plant_species_id')) {
+                $table->dropIndex(['plant_species_id']);
+            }
+            if (Schema::hasColumn('plant_stocks', 'plant_variety_id')) {
+                $table->dropIndex(['plant_variety_id']);
+            }
             $table->dropIndex(['status']);
         });
     }

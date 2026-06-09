@@ -117,6 +117,7 @@ class UserSeeder extends Seeder
             $permissions,
             fn ($permission) => str_contains($permission, '.view') ||
                 str_contains($permission, 'borrows.create') ||
+                str_contains($permission, 'chemical-usage-logs.create') ||
                 str_contains($permission, 'documents.download')
         );
 

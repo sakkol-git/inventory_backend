@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Inventory\Models;
 
 use App\Modules\Core\Concerns\EscapesSearchTerm;
@@ -11,7 +13,6 @@ use App\Modules\Inventory\Enums\LabLocation;
 use App\Modules\Inventory\Enums\SampleStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PlantSample extends Model
 {
     // traits
-    use EscapesSearchTerm, HasActivityLogging, HasAttributes, HasFactory, HasImageUpload, HasTransactions, SoftDeletes;
+    use EscapesSearchTerm, HasActivityLogging, HasFactory, HasImageUpload, HasTransactions, SoftDeletes;
 
     // table name
     protected $table = 'plant_samples';

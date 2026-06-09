@@ -6,12 +6,10 @@ namespace App\Modules\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Spatie\Permission\Traits\HasRoles;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    use HasRoles;
 
     public function handle(Request $request, Closure $next): Response
     {

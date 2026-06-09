@@ -18,29 +18,31 @@ return new class extends Migration
         });
         // Backfill balance_after from current stock table where possible
         // (best-effort; historical records will remain NULL)
-        DB::statement("
-    UPDATE transactions t
-    JOIN plant_stocks ps
-        ON ps.id = t.transactionable_id
-
-    JOIN (
-        SELECT *
-        FROM (
-            SELECT
-                MAX(id) AS max_id,
-                transactionable_id,
-                transactionable_type
-            FROM transactions
-            GROUP BY transactionable_id, transactionable_type
-        ) latest
-    ) latest_tx
-        ON latest_tx.max_id = t.id
-
-    SET t.balance_after = ps.quantity
-
-    WHERE t.transactionable_type =
-    'App\\\\Modules\\\\Inventory\\\\Models\\\\PlantStock'
-");
+        if (!app()->runningUnitTests() && DB::getDriverName() === 'mysql') {
+            DB::statement("
+                UPDATE transactions t
+                JOIN plant_stocks ps
+                    ON ps.id = t.transactionable_id
+            
+                JOIN (
+                    SELECT *
+                    FROM (
+                        SELECT
+                            MAX(id) AS max_id,
+                            transactionable_id,
+                            transactionable_type
+                        FROM transactions
+                        GROUP BY transactionable_id, transactionable_type
+                    ) latest
+                ) latest_tx
+                    ON latest_tx.max_id = t.id
+            
+                SET t.balance_after = ps.quantity
+            
+                WHERE t.transactionable_type =
+                'App\\\\Modules\\\\Inventory\\\\Models\\\\PlantStock'
+            ");
+        }
     }
 
     public function down(): void

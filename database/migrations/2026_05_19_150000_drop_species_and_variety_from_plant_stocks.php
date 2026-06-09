@@ -19,7 +19,7 @@ return new class extends Migration
         $speciesExists = Schema::hasColumn('plant_stocks', 'plant_species_id');
         $varietyExists = Schema::hasColumn('plant_stocks', 'plant_variety_id');
 
-        if ($speciesExists || $varietyExists) {
+        if (($speciesExists || $varietyExists) && !app()->runningUnitTests() && DB::getDriverName() === 'mysql') {
             $constraints = DB::select(
                 'SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME IN (?, ?) AND REFERENCED_TABLE_NAME IS NOT NULL',
                 ['plant_stocks', 'plant_species_id', 'plant_variety_id']
@@ -32,7 +32,9 @@ return new class extends Migration
                     // Ignore if the foreign key was already removed or does not exist
                 }
             }
-
+        }
+        
+        if ($speciesExists || $varietyExists) {
             Schema::table('plant_stocks', function (Blueprint $table) use ($speciesExists, $varietyExists): void {
                 try {
                     $table->dropIndex('plant_stocks_sample_idx');
@@ -40,12 +42,27 @@ return new class extends Migration
                     // index may not exist or be named differently; ignore
                 }
 
-                if ($speciesExists) {
-                    $table->dropColumn('plant_species_id');
+                if (DB::getDriverName() !== 'sqlite') {
+                    if ($speciesExists) {
+                        try {
+                            $table->dropForeign(['plant_species_id']);
+                        } catch (Exception $e) {}
+                    }
+                    if ($varietyExists) {
+                        try {
+                            $table->dropForeign(['plant_variety_id']);
+                        } catch (Exception $e) {}
+                    }
                 }
 
-                if ($varietyExists) {
-                    $table->dropColumn('plant_variety_id');
+                if (DB::getDriverName() !== 'sqlite') {
+                    if ($speciesExists) {
+                        $table->dropColumn('plant_species_id');
+                    }
+
+                    if ($varietyExists) {
+                        $table->dropColumn('plant_variety_id');
+                    }
                 }
             });
         }

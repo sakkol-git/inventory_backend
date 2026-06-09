@@ -12,13 +12,14 @@ class BorrowRecordPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $this->canManage($user) && $user->hasPermissionTo('borrows.view', 'api');
+        return $this->canManage($user) || $user->hasPermissionTo('borrows.view', 'api');
     }
 
     public function view(User $user, BorrowRecord $record): bool
     {
         return $user->id === $record->user_id
-            || $this->canManage($user);
+            || $this->canManage($user)
+            || $user->hasPermissionTo('borrows.view', 'api');
     }
 
     public function create(User $user): bool

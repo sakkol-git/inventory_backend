@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Authentication Routes (public) ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
     Route::middleware('auth:api')->group(function () {
         Route::get('profile', [AuthController::class, 'profile']);
@@ -57,16 +57,11 @@ Route::middleware('auth:api')->group(function () {
 
     // ─── Role & Permission Management (admin only) ───────────────────────────
     Route::middleware('admin')->group(function () {
-        Route::apiResource('roles', RoleController::class)->except(['create', 'edit']);
 
         Route::get('roles/{id}/permissions', [RoleController::class, 'permissions']);
         Route::post('roles/{id}/permissions', [RoleController::class, 'assignPermission']);
         Route::delete('roles/{id}/permissions/{permission}', [RoleController::class, 'revokePermission']);
 
-        Route::get('roles/{id}/users', [RoleController::class, 'users']);
-        Route::post('roles/{id}/users', [RoleController::class, 'assignToUser']);
-        Route::delete('roles/{id}/users/{userId}', [RoleController::class, 'revokeFromUser']);
-
-        Route::apiResource('permissions', PermissionController::class)->except(['create', 'edit']);
+        Route::apiResource('permissions', PermissionController::class)->except(['create', 'edit', 'delete']);
     });
 });
