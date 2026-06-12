@@ -23,7 +23,7 @@ class StoreBorrowRecordRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Authorization is handled in the controller via policies
+        return $this->user('api')?->can('create', \App\Modules\Inventory\Models\BorrowRecord::class) ?? false;
     }
 
     /**
@@ -42,7 +42,7 @@ class StoreBorrowRecordRequest extends FormRequest
                 'required',
                 'integer',
             ],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'due_at' => ['required', 'date', 'after:today'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

@@ -18,7 +18,8 @@ class UpdateEquipmentRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return true;
+        $equipment = $this->route('equipment');
+        return $this->user('api')?->can('update', $equipment) ?? false;
     }
 
     /** @return array<string, ValidationRule|array<mixed>|string> */
@@ -40,7 +41,7 @@ class UpdateEquipmentRequest extends FormRequest
             'model_name' => ['nullable', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
             'purchase_date' => ['nullable', 'date'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0'],
+            'purchase_price' => ['nullable', 'decimal:0,2', 'min:0'],
             'description' => ['nullable', 'string'],
             ...$this->imageRules(),
         ];

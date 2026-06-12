@@ -121,7 +121,7 @@ class BorrowableResolver
         }
 
         if ($borrowable instanceof Chemical) {
-            $borrowable->decrement('quantity', $quantity);
+            $borrowable->update(['quantity' => $borrowable->quantity - $quantity]);
             $this->log($borrowable, $actor, TransactionAction::BORROWED, $quantity);
 
             return;
@@ -165,7 +165,7 @@ class BorrowableResolver
         }
 
         if ($borrowable instanceof Chemical) {
-            $borrowable->increment('quantity', $quantity);
+            $borrowable->update(['quantity' => $borrowable->quantity + $quantity]);
             $this->log($borrowable, $actor, TransactionAction::RETURNED, $quantity);
 
             return;

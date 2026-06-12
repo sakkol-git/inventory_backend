@@ -50,16 +50,27 @@ class AuthController extends Controller
     // Register a new User and assign default role
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
-            ...$request->validated(),
-            'role' => UserRole::STUDENT->value, // Default role
-        ]);
+        $validated = $request->validated();
 
-        // Assign default role using Spatie's Permission package
-        $spatieRole = Role::firstOrCreate([
-            'name' => UserRole::STUDENT->value,
-            'guard_name' => 'api', ]);
-        $user->assignRole($spatieRole);
+        $user = \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'phone' => $validated['phone'] ?? null,
+                'role' => UserRole::STUDENT->value, // Default role explicitly set
+            ]);
+
+            // Assign default role using Spatie's Permission package
+            $spatieRole = Role::firstOrCreate([
+                'name' => UserRole::STUDENT->value,
+                'guard_name' => 'api',
+            ]);
+            $user->assignRole($spatieRole);
+
+            return $user;
+        });
+
         $token = $this->jwt()->login($user);
 
         return $this->respondWithToken($token, $user)->setStatusCode(201);
@@ -72,10 +83,22 @@ class AuthController extends Controller
 
         // check if user exists and credentials are valid
         if (! $token = $this->jwt()->attempt($credentials)) {
+            \Illuminate\Support\Facades\Log::warning('Failed login attempt', [
+                'email' => $credentials['email'] ?? 'unknown',
+                'ip' => $request->ip(),
+                'request_id' => $request->header('X-Request-Id'),
+            ]);
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
         $user = $this->jwt()->user();
+
+        \Illuminate\Support\Facades\Log::info('Successful login', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'ip' => $request->ip(),
+            'request_id' => $request->header('X-Request-Id'),
+        ]);
 
         return $this->respondWithToken($token, $user);
 
@@ -98,7 +121,12 @@ class AuthController extends Controller
         // Clear the token cookie
         $cookie = Cookie::forget(config('jwt.cookie_key_name', 'token'));
 
-        return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
+        return response()->json([
+            'success' => true,
+            'message' => 'Successfully logged out',
+            'data' => null,
+            'errors' => null,
+        ])->withCookie($cookie);
     }
 
     // Refresh token

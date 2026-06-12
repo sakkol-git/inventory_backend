@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
+            \App\Http\Middleware\EnsureRequestId::class,
             ForceJsonResponse::class,
             ThrottleRequests::class.':60,1',
         ]);
@@ -82,6 +83,22 @@ return Application::configure(basePath: dirname(__DIR__))
                     'success' => false,
                     'message' => 'Resource not found',
                 ], 404);
+            }
+        });
+        // ____Database Exceptions____
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, Request $request) {
+            if ($request->is('api/*')) {
+                Log::error('Database query error', [
+                    'message' => $e->getMessage(),
+                    'sql' => $e->getSql(),
+                    'request_id' => $request->header('X-Request-Id'),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A database error occurred.',
+                    'code' => 'DATABASE_ERROR',
+                ], 500);
             }
         });
         // ── Route Not Found ──────────────────────────────────────────────

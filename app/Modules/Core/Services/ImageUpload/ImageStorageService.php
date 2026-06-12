@@ -63,15 +63,22 @@ class ImageStorageService
 
     public function deletePath(?string $path): void
     {
-        if (! $path) {
+        if (! $path || str_contains($path, '..')) {
             return;
         }
 
-        /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk($this->disk);
+        try {
+            /** @var FilesystemAdapter $disk */
+            $disk = Storage::disk($this->disk);
 
-        if ($disk->exists($path)) {
-            $disk->delete($path);
+            if ($disk->exists($path)) {
+                $disk->delete($path);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to delete old image', [
+                'path' => $path,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

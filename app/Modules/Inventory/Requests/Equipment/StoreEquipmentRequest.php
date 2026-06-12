@@ -18,7 +18,7 @@ class StoreEquipmentRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return true;
+        return $this->user('api')?->can('create', \App\Modules\Inventory\Models\Equipment::class) ?? false;
     }
 
     /** @return array<string, ValidationRule|array<mixed>|string> */
@@ -35,7 +35,7 @@ class StoreEquipmentRequest extends FormRequest
             'model_name' => ['nullable', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
             'purchase_date' => ['nullable', 'date'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0'],
+            'purchase_price' => ['nullable', 'decimal:0,2', 'min:0'],
             'description' => ['nullable', 'string'],
             ...$this->imageRules(),
         ];

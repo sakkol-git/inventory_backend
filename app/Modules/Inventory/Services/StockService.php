@@ -31,7 +31,7 @@ class StockService
                 );
             }
 
-            $stock->decrement('quantity', $quantity);
+            $stock->update(['quantity' => $stock->quantity - $quantity]);
             $this->syncStatus($stock);
 
             return $stock->refresh();
@@ -55,7 +55,7 @@ class StockService
                 );
             }
 
-            $stock->increment('reserved_quantity', $quantity);
+            $stock->update(['reserved_quantity' => $stock->reserved_quantity + $quantity]);
             $this->syncStatus($stock);
 
             return $stock->refresh();
@@ -71,7 +71,7 @@ class StockService
             $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
             $releaseQty = min($quantity, $stock->reserved_quantity);
             
-            $stock->decrement('reserved_quantity', $releaseQty);
+            $stock->update(['reserved_quantity' => $stock->reserved_quantity - $releaseQty]);
             $this->syncStatus($stock);
 
             return $stock->refresh();
@@ -85,7 +85,7 @@ class StockService
     {
         return DB::transaction(function () use ($stock, $quantity): PlantStock {
             $stock = PlantStock::lockForUpdate()->findOrFail($stock->id);
-            $stock->increment('quantity', $quantity);
+            $stock->update(['quantity' => $stock->quantity + $quantity]);
             $this->syncStatus($stock);
 
             return $stock->refresh();

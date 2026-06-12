@@ -15,7 +15,7 @@ class CrudListService
     private static array $allowedSortColumns = [];
 
     public function listItems(
-        string $modelClass,
+        string|Builder $modelOrQuery,
         Request $request,
         int $perPage = 15,
         array $with = [],
@@ -26,7 +26,7 @@ class CrudListService
         string $defaultSortDir = 'desc',
     ): LengthAwarePaginator {
         /** @var Builder $query */
-        $query = $modelClass::query()->with($with);
+        $query = $modelOrQuery instanceof Builder ? $modelOrQuery->with($with) : $modelOrQuery::query()->with($with);
 
         $this->applySearch($query, $request);
         $this->applyFilters($query, $request, $filterMap);

@@ -30,14 +30,16 @@ class BorrowRecordController extends Controller
     {
         $user = $request->user('api');
 
+        $query = BorrowRecord::query();
+
         if ($this->canViewAll($user)) {
             $this->authorize('viewAny', BorrowRecord::class);
         } else {
-            $request->merge(['user_id' => $user?->id]);
+            $query->where('user_id', $user?->id);
         }
 
         $records = $this->crudList->listItems(
-            BorrowRecord::class,
+            $query,
             $request,
             15,
             ['user', 'borrowable', 'reviewer'],
@@ -59,10 +61,10 @@ class BorrowRecordController extends Controller
         $request->user('api');
 
         $this->authorize('viewAny', BorrowRecord::class);
-        $request->merge(['pending_only' => true]);
+        $query = BorrowRecord::query()->pending();
 
         $records = $this->crudList->listItems(
-            BorrowRecord::class,
+            $query,
             $request,
             15,
             ['user', 'borrowable', 'reviewer'],
@@ -85,10 +87,10 @@ class BorrowRecordController extends Controller
         $request->user('api');
 
         $this->authorize('viewAny', BorrowRecord::class);
-        $request->merge(['overdue_only' => true]);
+        $query = BorrowRecord::query()->overdue();
 
         $records = $this->crudList->listItems(
-            BorrowRecord::class,
+            $query,
             $request,
             15,
             ['user', 'borrowable', 'reviewer'],

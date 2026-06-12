@@ -44,7 +44,18 @@ class RequestBorrowService
 
         // Send notifications outside transaction to prevent blocking on queue failures
         User::role([UserRole::ADMIN->value, UserRole::LAB_MANAGER->value], 'api')->each(
-            fn (User $mgr) => $mgr->notify(new RequestBorrowNotification($record))
+            function (User $mgr) use ($record) {
+                try {
+                    $mgr->notify(new RequestBorrowNotification($record));
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('Failed to dispatch borrow request notification', [
+                        'borrow_record_id' => $record->id,
+                        'manager_id' => $mgr->id,
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+            }
         );
 
         return $record->refresh();
