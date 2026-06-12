@@ -34,7 +34,7 @@ class ImageStorageService
         $result = $disk->putFileAs("images/{$folder}", $file, $name, ['visibility' => 'public']);
 
         if ($result === false || ! $disk->exists($path)) {
-            throw new \RuntimeException("Image upload failed for disk {$this->disk} path {$path}");
+            throw new \App\Exceptions\StorageException("Image upload failed for disk {$this->disk} path {$path}");
         }
 
         return $path;

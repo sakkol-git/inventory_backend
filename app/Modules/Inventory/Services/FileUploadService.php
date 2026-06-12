@@ -78,7 +78,13 @@ class FileUploadService
         $filename = Str::uuid().'.'.$extension;
 
         // 6. Store in private disk
-        return $file->storeAs($folder, $filename, $disk);
+        $path = $file->storeAs($folder, $filename, $disk);
+
+        if ($path === false) {
+            throw new \App\Exceptions\StorageException("Failed to store document in {$folder}.");
+        }
+
+        return $path;
     }
 
     /**

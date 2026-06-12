@@ -62,10 +62,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // ____Authentication Exceptions____
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthenticated',
-                ], 401);
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: 'UNAUTHENTICATED',
+                    message: 'Unauthenticated',
+                );
+                return response()->json($response->toArray(), 401);
             }
         });
         // ____Validation Exceptions____
@@ -79,10 +81,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // ____Model Not Found Exceptions____
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Resource not found',
-                ], 404);
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: 'RESOURCE_NOT_FOUND',
+                    message: 'Resource not found',
+                );
+                return response()->json($response->toArray(), 404);
             }
         });
         // ____Database Exceptions____
@@ -94,38 +98,68 @@ return Application::configure(basePath: dirname(__DIR__))
                     'request_id' => $request->header('X-Request-Id'),
                 ]);
 
-                return response()->json([
-                    'success' => false,
-                    'message' => 'A database error occurred.',
-                    'code' => 'DATABASE_ERROR',
-                ], 500);
+                $response = new StandardErrorResponse(
+                    error: 'DatabaseException',
+                    code: 'DATABASE_ERROR',
+                    message: 'A database error occurred.',
+                );
+                return response()->json($response->toArray(), 500);
+            }
+        });
+        
+        $exceptions->render(function (\PDOException $e, Request $request) {
+            if ($request->is('api/*')) {
+                Log::error('PDO error', [
+                    'message' => $e->getMessage(),
+                    'request_id' => $request->header('X-Request-Id'),
+                ]);
+
+                $response = new StandardErrorResponse(
+                    error: 'DatabaseException',
+                    code: 'DATABASE_ERROR',
+                    message: 'A database error occurred.',
+                );
+                return response()->json($response->toArray(), 500);
             }
         });
         // ── Route Not Found ──────────────────────────────────────────────
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Endpoint not found.',
-                ], 404);
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: 'ENDPOINT_NOT_FOUND',
+                    message: 'Endpoint not found.',
+                );
+                return response()->json($response->toArray(), 404);
             }
         });
         // ── Forbidden ────────────────────────────────────────────────────
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage() ?: 'Forbidden.',
-                ], 403);
+                Log::warning('Authorization failure / Privilege escalation attempt', [
+                    'user_id' => $request->user('api')?->id ?? 'guest',
+                    'ip' => $request->ip(),
+                    'path' => $request->path(),
+                    'request_id' => $request->header('X-Request-Id'),
+                ]);
+
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: 'FORBIDDEN',
+                    message: $e->getMessage() ?: 'Forbidden.',
+                );
+                return response()->json($response->toArray(), 403);
             }
         });
         // ── Rate Limiting ────────────────────────────────────────────────
         $exceptions->render(function (TooManyRequestsHttpException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Too many requests. Please try again later.',
-                ], 429);
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: 'TOO_MANY_REQUESTS',
+                    message: 'Too many requests. Please try again later.',
+                );
+                return response()->json($response->toArray(), 429);
             }
         });
         // ── Generic Catch-All (API only) ─────────────────────────────────
@@ -140,18 +174,20 @@ return Application::configure(basePath: dirname(__DIR__))
                         'message' => $e->getMessage(),
                         'file' => $e->getFile(),
                         'line' => $e->getLine(),
+                        'request_id' => $request->header('X-Request-Id'),
+                        'user_id' => $request->user('api')?->id ?? 'guest',
+                        'path' => $request->path(),
+                        'method' => $request->method(),
                     ]);
                 }
 
-                $payload = [
-                    'success' => false,
-                    'message' => $status === 500
-                        ? 'An unexpected error occurred.'
-                        : ($e->getMessage() ?: 'Error'),
-                ];
+                $message = $status === 500
+                    ? 'An unexpected error occurred.'
+                    : ($e->getMessage() ?: 'Error');
 
+                $details = [];
                 if (app()->hasDebugModeEnabled()) {
-                    $payload['debug'] = [
+                    $details = [
                         'exception' => get_class($e),
                         'message' => $e->getMessage(),
                         'file' => $e->getFile(),
@@ -159,7 +195,14 @@ return Application::configure(basePath: dirname(__DIR__))
                     ];
                 }
 
-                return response()->json($payload, $status);
+                $response = new StandardErrorResponse(
+                    error: class_basename($e),
+                    code: $status === 500 ? 'INTERNAL_ERROR' : 'ERROR',
+                    message: $message,
+                    details: $details,
+                );
+
+                return response()->json($response->toArray(), $status);
             }
         });
     })->create();

@@ -21,6 +21,8 @@ readonly class StandardErrorResponse
         public string $message,
         public array $details = [],
         public string $timestamp = '',
+        public bool $success = false,
+        public ?string $correlation_id = null,
     ) {}
 
     /**
@@ -29,6 +31,11 @@ readonly class StandardErrorResponse
     public function getTimestamp(): string
     {
         return $this->timestamp !== '' ? $this->timestamp : now()->toIso8601String();
+    }
+
+    public function getCorrelationId(): ?string
+    {
+        return $this->correlation_id ?? request()->header('X-Request-Id');
     }
 
     /**
@@ -83,10 +90,12 @@ readonly class StandardErrorResponse
     public function toArray(): array
     {
         return [
+            'success' => $this->success,
             'error' => $this->error,
             'code' => $this->code,
             'message' => $this->message,
             'details' => $this->details,
+            'correlation_id' => $this->getCorrelationId(),
             'timestamp' => $this->getTimestamp(),
         ];
     }
