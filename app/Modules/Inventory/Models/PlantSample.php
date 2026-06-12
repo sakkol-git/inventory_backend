@@ -66,7 +66,9 @@ class PlantSample extends Model
             ->whereNull('deleted_at')
             ->sum('quantity');
 
-        return $stocksSum > 0 ? $stocksSum : $this->quantity;
+        $stocksSum = (int) $stocksSum;
+
+        return $stocksSum > 0 ? $stocksSum : ($this->quantity !== null ? (int) $this->quantity : null);
     }
 
     public function plantVariety(): BelongsTo
