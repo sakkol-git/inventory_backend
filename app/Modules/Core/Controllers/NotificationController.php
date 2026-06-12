@@ -20,7 +20,7 @@ class NotificationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = min((int) $request->query('per_page', 15), 50);
+        $perPage = min((int) $request->query('per_page', 8), 100);
         $filter = $request->query('filter'); // 'unread' | 'read' | null (all)
 
         $query = $request->user()->notifications();

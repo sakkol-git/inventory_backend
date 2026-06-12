@@ -33,8 +33,8 @@ class ChemicalResource extends JsonResource
             'description' => $chemical->description,
             'image_url' => ImageUploadService::resolveImageUrl($chemical->image_path, $chemical->image_url),
             'is_expired' => $chemical->is_expired,
-            'created_at' => $chemical->created_at?->toIso8601String(),
-            'updated_at' => $chemical->updated_at?->toIso8601String(),
+            'created_at' => $chemical->created_at?->toISOString(),
+            'updated_at' => $chemical->updated_at?->toISOString(),
         ];
     }
 }

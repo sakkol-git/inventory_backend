@@ -17,7 +17,7 @@ class ChemicalUsageLogResource extends JsonResource
             'quantity_used' => $this->quantity_used,
             'unit' => $this->unit,
             'purpose' => $this->purpose,
-            'used_at' => $this->used_at?->toIso8601String(),
+            'used_at' => $this->used_at?->toISOString(),
             'notes' => $this->notes,
             'experiment_name' => $this->experiment_name,
             'user' => [
@@ -25,7 +25,7 @@ class ChemicalUsageLogResource extends JsonResource
                 'name' => $this->whenLoaded('user', fn () => $this->user->name),
             ],
             'chemical' => new ChemicalResource($this->whenLoaded('chemical')),
-            'created_at' => $this->created_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

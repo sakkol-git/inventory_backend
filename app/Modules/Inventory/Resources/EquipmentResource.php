@@ -37,8 +37,8 @@ class EquipmentResource extends JsonResource
             'description' => $equipment->description,
             'image_url' => ImageUploadService::resolveImageUrl($equipment->image_path, $equipment->image_url),
             'is_borrowable' => $equipment->is_borrowable,
-            'created_at' => $equipment->created_at?->toIso8601String(),
-            'updated_at' => $equipment->updated_at?->toIso8601String(),
+            'created_at' => $equipment->created_at?->toISOString(),
+            'updated_at' => $equipment->updated_at?->toISOString(),
         ];
     }
 }

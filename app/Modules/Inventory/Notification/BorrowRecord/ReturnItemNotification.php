@@ -31,8 +31,8 @@ class ReturnItemNotification extends Notification
             'type' => 'return_item',
             'record_id' => $this->record->id,
             'borrowable_name' => $itemName,
-            'borrowed_at' => $this->record->borrowed_at?->toIso8601String(),
-            'returned_at' => $this->record->returned_at?->toIso8601String(),
+            'borrowed_at' => $this->record->borrowed_at?->toISOString(),
+            'returned_at' => $this->record->returned_at?->toISOString(),
             'reviewer_name' => $this->record->reviewer?->name,
             'message' => "The item {$itemName} has been returned.",
         ];

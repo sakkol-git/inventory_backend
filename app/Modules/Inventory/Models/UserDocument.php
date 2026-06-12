@@ -26,6 +26,7 @@ class UserDocument extends Model
         'file_type',
         'file_size',
         'description',
+        'status',
     ];
 
     protected function casts(): array

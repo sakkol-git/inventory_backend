@@ -27,8 +27,8 @@ class PlantVarietyResource extends JsonResource
             'image_url' => ImageUploadService::resolveImageUrl($this->image_path, $this->image_url),
             // Only embedded when the relationship was eager-loaded
             'plant_species' => new PlantSpeciesResource($this->whenLoaded('plantSpecies')),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

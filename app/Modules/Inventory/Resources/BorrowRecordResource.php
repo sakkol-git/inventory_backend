@@ -34,14 +34,14 @@ class BorrowRecordResource extends JsonResource
             'id' => $record->id,
             'status' => $record->status?->value,
             'quantity' => $record->quantity,
-            'borrowed_at' => $record->borrowed_at?->toIso8601String(),
-            'due_at' => $record->due_at?->toIso8601String(),
-            'returned_at' => $record->returned_at?->toIso8601String(),
+            'borrowed_at' => $record->borrowed_at?->toISOString(),
+            'due_at' => $record->due_at?->toISOString(),
+            'returned_at' => $record->returned_at?->toISOString(),
             'notes' => $record->notes,
-            'reviewed_at' => $record->reviewed_at?->toIso8601String(),
+            'reviewed_at' => $record->reviewed_at?->toISOString(),
             'rejected_reason' => $record->rejected_reason,
-            'created_at' => $record->created_at?->toIso8601String(),
-            'updated_at' => $record->updated_at?->toIso8601String(),
+            'created_at' => $record->created_at?->toISOString(),
+            'updated_at' => $record->updated_at?->toISOString(),
 
             // Computed flags — avoids repeated logic in the frontend
             'is_overdue' => $record->status === BorrowStatus::OVERDUE

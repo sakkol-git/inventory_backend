@@ -87,7 +87,7 @@ class DashboardService
                     'item_id' => $tx->transactionable_id,
                     'quantity' => $tx->quantity,
                     'note' => $tx->note,
-                    'created_at' => $tx->created_at?->toIso8601String(),
+                    'created_at' => $tx->created_at?->toISOString(),
                 ])
                 ->all();
         });

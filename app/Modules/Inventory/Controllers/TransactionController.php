@@ -17,9 +17,17 @@ class TransactionController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('view', Transaction::class);
+        $user = $request->user('api');
+        
         $query = Transaction::with(['user', 'transactionable'])
             ->latest();
+
+        // Standard users can only view their own transactions.
+        if ($user->hasPermissionTo('transactions.view', 'api') || $user->hasAnyRole(['admin', 'lab_manager'], 'api')) {
+            $this->authorize('viewAny', Transaction::class);
+        } else {
+            $query->where('user_id', $user->id);
+        }
 
         if ($request->filled('type')) {
             $query->forType($request->input('type'));
@@ -34,7 +42,8 @@ class TransactionController extends Controller
             $query->recent();
         }
 
-        return TransactionResource::collection($query->paginate(15));
+        $perPage = min((int) $request->query('per_page', 8), 100);
+        return TransactionResource::collection($query->paginate($perPage));
     }
 
     /**

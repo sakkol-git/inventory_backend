@@ -36,7 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\EnsureRequestId::class,
             ForceJsonResponse::class,
-            ThrottleRequests::class.':60,1',
+            'throttle:api',
         ]);
 
         $middleware->alias([

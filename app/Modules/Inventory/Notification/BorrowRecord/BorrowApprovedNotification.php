@@ -31,8 +31,8 @@ class BorrowApprovedNotification extends Notification
             'type' => 'borrow_approved',
             'record_id' => $this->record->id,
             'borrowable_name' => $itemName,
-            'borrowed_at' => $this->record->borrowed_at?->toIso8601String(),
-            'due_at' => $this->record->due_at?->toIso8601String(),
+            'borrowed_at' => $this->record->borrowed_at?->toISOString(),
+            'due_at' => $this->record->due_at?->toISOString(),
             'reviewer_name' => $this->record->reviewer?->name,
             'message' => "Your borrow request for {$itemName} has been approved.",
         ];

@@ -26,6 +26,11 @@ class EquipmentController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Equipment::class);
+
+        // Note: Equipment is global lab property and does not have an owner (user_id).
+        // Therefore, we intentionally do NOT scope the query to the authenticated user.
+        // All authenticated users can view the full equipment inventory to check availability.
+        
         $equipment = $this->crudService->listItems(
             modelOrQuery: Equipment::class,
             request: $request,

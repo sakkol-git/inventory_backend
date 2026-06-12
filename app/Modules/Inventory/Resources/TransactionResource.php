@@ -25,7 +25,7 @@ class TransactionResource extends JsonResource
                 'id' => $this->transactionable_id,
                 'data' => $this->whenLoaded('transactionable'),
             ],
-            'created_at' => $this->created_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

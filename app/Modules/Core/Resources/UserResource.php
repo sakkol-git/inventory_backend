@@ -23,8 +23,8 @@ class UserResource extends JsonResource
                 $this->relationLoaded('permissions') || $this->relationLoaded('roles'),
                 fn () => $this->getAllPermissions()->pluck('name')->values()
             ),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

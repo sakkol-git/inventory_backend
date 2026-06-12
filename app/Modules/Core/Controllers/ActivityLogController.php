@@ -25,7 +25,7 @@ class ActivityLogController extends Controller
      *  - event        (string) — created|updated|deleted
      *  - from         (date)  — start date (inclusive)
      *  - to           (date)  — end date (inclusive)
-     *  - per_page     (int)   — pagination size (max 50)
+     *  - per_page     (int)   — pagination size (max 100)
      */
     public function index(Request $request): JsonResponse
     {
@@ -38,10 +38,10 @@ class ActivityLogController extends Controller
             'event' => ['string', 'in:created,updated,deleted'],
             'from' => ['date'],
             'to' => ['date'],
-            'per_page' => ['integer', 'min:1', 'max:50'],
+            'per_page' => ['integer', 'min:1', 'max:100'],
         ]);
 
-        $perPage = min((int) $request->query('per_page', '20'), 50);
+        $perPage = min((int) $request->query('per_page', '8'), 100);
 
         $query = Activity::query()
             ->with('causer:id,name,email')
@@ -88,7 +88,7 @@ class ActivityLogController extends Controller
                     'email' => $log->causer->email,
                 ] : null,
                 'properties' => $log->properties,
-                'created_at' => $log->created_at->toIso8601String(),
+                'created_at' => $log->created_at->toISOString(),
             ]),
             'meta' => [
                 'current_page' => $logs->currentPage(),
@@ -123,7 +123,7 @@ class ActivityLogController extends Controller
                     'email' => $log->causer->email,
                 ] : null,
                 'properties' => $log->properties,
-                'created_at' => $log->created_at->toIso8601String(),
+                'created_at' => $log->created_at->toISOString(),
             ],
         ]);
     }

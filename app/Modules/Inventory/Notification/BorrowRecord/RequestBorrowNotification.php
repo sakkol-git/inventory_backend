@@ -31,8 +31,8 @@ class RequestBorrowNotification extends Notification
             'type' => 'request_borrow',
             'record_id' => $this->record->id,
             'borrowable_name' => $itemName,
-            'requested_at' => $this->record->created_at?->toIso8601String(),
-            'due_at' => $this->record->due_at?->toIso8601String(),
+            'requested_at' => $this->record->created_at?->toISOString(),
+            'due_at' => $this->record->due_at?->toISOString(),
             'reviewer_name' => $this->record->reviewer?->name,
             'message' => "New borrow request submitted for {$itemName}.",
         ];

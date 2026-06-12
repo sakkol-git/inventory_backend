@@ -31,7 +31,7 @@ class BorrowRejectNotification extends Notification
             'type' => 'borrow_rejected',
             'record_id' => $this->record->id,
             'borrowable_name' => $itemName,
-            'due_at' => $this->record->due_at?->toIso8601String(),
+            'due_at' => $this->record->due_at?->toISOString(),
             'reviewer_name' => $this->record->reviewer?->name,
             'rejected_reason' => $this->record->rejected_reason,
             'message' => "Your borrow request for {$itemName} has been rejected.",

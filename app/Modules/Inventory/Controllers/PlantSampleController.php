@@ -23,9 +23,17 @@ class PlantSampleController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', PlantSample::class);
+        $user = $request->user('api');
+
+        if ($user->hasAnyRole(['admin', 'lab_manager'], 'api')) {
+            $this->authorize('viewAny', PlantSample::class);
+            $query = PlantSample::query();
+        } else {
+            $query = PlantSample::where('user_id', $user->id);
+        }
+
         $samples = $this->crudService->listItems(
-            modelOrQuery: PlantSample::class,
+            modelOrQuery: $query,
             request: $request,
             perPage: 8,
             with: ['plantVariety', 'contributor', 'stocks'],

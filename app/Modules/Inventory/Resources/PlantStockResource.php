@@ -29,8 +29,8 @@ class PlantStockResource extends JsonResource
             'relations' => [
                 'sample' => new PlantSampleResource($this->whenLoaded('sample')),
             ],
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

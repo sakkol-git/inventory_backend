@@ -30,7 +30,7 @@ readonly class StandardErrorResponse
      */
     public function getTimestamp(): string
     {
-        return $this->timestamp !== '' ? $this->timestamp : now()->toIso8601String();
+        return $this->timestamp !== '' ? $this->timestamp : now()->toISOString();
     }
 
     public function getCorrelationId(): ?string
@@ -48,7 +48,7 @@ readonly class StandardErrorResponse
             code: $exception->getErrorCode(),
             message: $exception->getMessage(),
             details: $exception->getContext(),
-            timestamp: now()->toIso8601String(),
+            timestamp: now()->toISOString(),
         );
     }
 
@@ -62,7 +62,7 @@ readonly class StandardErrorResponse
             code: 'INTERNAL_ERROR',
             message: $exception->getMessage() ?: 'An unexpected error occurred',
             details: ['file' => $exception->getFile(), 'line' => $exception->getLine()],
-            timestamp: now()->toIso8601String(),
+            timestamp: now()->toISOString(),
         );
     }
 
@@ -78,7 +78,7 @@ readonly class StandardErrorResponse
             code: 'VALIDATION_ERROR',
             message: 'Validation failed',
             details: ['errors' => $errors],
-            timestamp: now()->toIso8601String(),
+            timestamp: now()->toISOString(),
         );
     }
 

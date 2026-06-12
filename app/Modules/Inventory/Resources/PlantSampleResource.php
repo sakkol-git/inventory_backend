@@ -51,15 +51,15 @@ class PlantSampleResource extends JsonResource
             ],
 
             'lab_info' => [
-                'brought_at' => $sample->brought_at?->toIso8601String(),
+                'brought_at' => $sample->brought_at?->toISOString(),
                 'location' => $sample->lab_location?->value,
             ],
 
             'meta' => [
                 'description' => $sample->description,
                 'image' => ImageUploadService::resolveImageUrl($sample->image_path, $sample->image_url),
-                'created_at' => $sample->created_at?->toIso8601String(),
-                'updated_at' => $sample->updated_at?->toIso8601String(),
+                'created_at' => $sample->created_at?->toISOString(),
+                'updated_at' => $sample->updated_at?->toISOString(),
             ],
         ];
     }

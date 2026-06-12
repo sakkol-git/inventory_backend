@@ -32,8 +32,8 @@ class PlantSpeciesResource extends JsonResource
             'propagation_method' => $species->propagation_method,
             'description' => $species->description,
             'image_url' => ImageUploadService::resolveImageUrl($species->image_path, $species->image_url),
-            'created_at' => $species->created_at?->toIso8601String(),
-            'updated_at' => $species->updated_at?->toIso8601String(),
+            'created_at' => $species->created_at?->toISOString(),
+            'updated_at' => $species->updated_at?->toISOString(),
         ];
     }
 }
