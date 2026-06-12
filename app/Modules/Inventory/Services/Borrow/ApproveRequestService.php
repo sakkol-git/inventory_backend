@@ -47,13 +47,21 @@ class ApproveRequestService
                 'rejected_reason' => null,
             ]);
 
-            $this->borrowableResolver->applyBorrow($borrowable, $reviewer, $record->quantity);
+            $this->borrowableResolver->applyBorrow($borrowable, $record->user, $record->quantity);
 
             return $record->refresh();
         });
 
         // Send notification outside transaction to prevent blocking on queue failures
-        $updatedRecord->user->notify(new BorrowApprovedNotification($updatedRecord));
+        try {
+            $updatedRecord->user->notify(new BorrowApprovedNotification($updatedRecord));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to dispatch borrow approval notification', [
+                'borrow_record_id' => $updatedRecord->id,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         return $updatedRecord;
     }

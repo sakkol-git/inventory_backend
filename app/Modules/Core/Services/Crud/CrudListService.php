@@ -34,7 +34,14 @@ class CrudListService
         $this->applyBooleanScopes($query, $request, $booleanScopeMap);
         $this->applySorting($query, $request, $defaultSortBy, $defaultSortDir);
 
-        return $query->paginate($request->integer('per_page', $perPage));
+        $perPageInt = min($request->integer('per_page', $perPage), 100);
+        $page = $request->integer('page', 1);
+
+        if ($page > 500) {
+            abort(422, 'Deep pagination is not supported. Please use more specific search filters.');
+        }
+
+        return $query->paginate($perPageInt);
     }
 
     private function applySearch(Builder $query, Request $request): void

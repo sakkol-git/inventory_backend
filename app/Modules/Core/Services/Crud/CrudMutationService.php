@@ -7,7 +7,9 @@ namespace App\Modules\Core\Services\Crud;
 use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use App\Modules\Inventory\Enums\TransactionAction;
+use App\Exceptions\DomainException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CrudMutationService
@@ -24,16 +26,31 @@ class CrudMutationService
         User $user,
         ?Model $logTarget = null,
     ): Model {
-        $payload = $this->imageService->prepareDataForPersistence($data, $modelClass);
+        $lockKey = sprintf('create_mutation_%s_user_%d', md5($modelClass), $user->id);
+        
+        $lock = Cache::lock($lockKey, 3);
+        if (! $lock->get()) {
+            throw new DomainException(
+                code: 'DUPLICATE_SUBMISSION',
+                message: 'A similar request is already being processed. Please wait.',
+                statusCode: 409
+            );
+        }
 
-        return DB::transaction(function () use ($modelClass, $payload, $user, $logTarget): Model {
-            /** @var Model $instance */
-            $instance = $modelClass::create($payload);
+        try {
+            $payload = $this->imageService->prepareDataForPersistence($data, $modelClass);
 
-            $this->logMutation($instance, $user, TransactionAction::ADDED, $logTarget);
+            return DB::transaction(function () use ($modelClass, $payload, $user, $logTarget): Model {
+                /** @var Model $instance */
+                $instance = $modelClass::create($payload);
 
-            return $instance;
-        });
+                $this->logMutation($instance, $user, TransactionAction::ADDED, $logTarget);
+
+                return $instance;
+            });
+        } finally {
+            $lock->release();
+        }
     }
 
     public function update(

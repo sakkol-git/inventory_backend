@@ -72,18 +72,22 @@ class PlantStockController extends Controller
         // ── Inventory Guard ─────────────────────────────────────────────────
         // When only one of the two fields is sent, cross-check against the
         // persisted value to ensure reserved never exceeds total quantity.
-        $newQuantity = (int) ($data['quantity'] ?? $plantStock->quantity);
-        $newReservedQuantity = (int) ($data['reserved_quantity'] ?? $plantStock->reserved_quantity);
+        $plantStock = \Illuminate\Support\Facades\DB::transaction(function () use ($plantStock, $data) {
+            $lockedStock = PlantStock::lockForUpdate()->findOrFail($plantStock->id);
+            
+            $newQuantity = (int) ($data['quantity'] ?? $lockedStock->quantity);
+            $newReservedQuantity = (int) ($data['reserved_quantity'] ?? $lockedStock->reserved_quantity);
 
-        if ($newReservedQuantity > $newQuantity) {
-            abort(422, 'Reserved quantity cannot exceed the total quantity.');
-        }
+            if ($newReservedQuantity > $newQuantity) {
+                abort(422, 'Reserved quantity cannot exceed the total quantity.');
+            }
 
-        $plantStock = $this->crudService->update(
-            instance: $plantStock,
-            data: $data,
-            user: auth('api')->user(),
-        );
+            return $this->crudService->update(
+                instance: $lockedStock,
+                data: $data,
+                user: auth('api')->user(),
+            );
+        });
 
         $plantStock->load('sample');
 

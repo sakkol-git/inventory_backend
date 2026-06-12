@@ -135,17 +135,27 @@ class BorrowableResolver
         }
 
         if ($borrowable instanceof PlantSample) {
-            // Decrement from related PlantStock records
-            $stock = $borrowable->stocks()
-                ->whereNull('deleted_at')
-                ->first();
+            $remaining = $quantity;
+            $stocks = $borrowable->stocks()->whereNull('deleted_at')->orderBy('id')->lockForUpdate()->get();
+            
+            foreach ($stocks as $stock) {
+                if ($remaining <= 0) break;
+                
+                $consumeQty = min($stock->available_quantity, $remaining);
+                if ($consumeQty > 0) {
+                    $this->stockService->consume($stock, $consumeQty);
+                    $remaining -= $consumeQty;
+                }
+            }
 
-            if ($stock) {
-                $this->stockService->consume($stock, $quantity);
+            if ($remaining > 0) {
+                throw new InsufficientStockException(
+                    requested: $quantity,
+                    available: $quantity - $remaining
+                );
             }
 
             $this->log($borrowable, $actor, TransactionAction::BORROWED, $quantity);
-
             return;
         }
 
@@ -186,6 +196,8 @@ class BorrowableResolver
 
             if ($stock) {
                 $this->stockService->restock($stock, $quantity);
+            } else {
+                throw new InvalidOperationException('cannot_restock_orphaned_sample');
             }
 
             $this->log($borrowable, $actor, TransactionAction::RETURNED, $quantity);

@@ -92,6 +92,16 @@ return Application::configure(basePath: dirname(__DIR__))
         // ____Database Exceptions____
         $exceptions->render(function (\Illuminate\Database\QueryException $e, Request $request) {
             if ($request->is('api/*')) {
+                // SQLSTATE 23000: Integrity constraint violation (Unique, Foreign Key)
+                if ($e->getCode() === '23000' || $e->getCode() === 23000) {
+                    $response = new StandardErrorResponse(
+                        error: 'ConflictException',
+                        code: 'STATE_CONFLICT',
+                        message: 'This record already exists or conflicts with another record.',
+                    );
+                    return response()->json($response->toArray(), 409);
+                }
+
                 Log::error('Database query error', [
                     'message' => $e->getMessage(),
                     'sql' => $e->getSql(),

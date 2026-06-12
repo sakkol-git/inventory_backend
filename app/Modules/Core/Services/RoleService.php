@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Core\Services;
 
+use App\Exceptions\DomainException;
 use App\Modules\Core\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -25,13 +27,28 @@ class RoleService
 
     public function create(array $data): Role
     {
-        $role = Role::create(['name' => $data['name'], 'guard_name' => $this->guard]);
+        $lockKey = sprintf('create_role_%s', md5($data['name'] ?? ''));
+        $lock = Cache::lock($lockKey, 3);
 
-        if (! empty($data['permissions'])) {
-            $role->syncPermissions($data['permissions']);
+        if (! $lock->get()) {
+            throw new DomainException(
+                code: 'DUPLICATE_SUBMISSION',
+                message: 'A role with this name is currently being created.',
+                statusCode: 409
+            );
         }
 
-        return $role->load('permissions');
+        try {
+            $role = Role::create(['name' => $data['name'], 'guard_name' => $this->guard]);
+
+            if (! empty($data['permissions'])) {
+                $role->syncPermissions($data['permissions']);
+            }
+
+            return $role->load('permissions');
+        } finally {
+            $lock->release();
+        }
     }
 
     public function find(int $id): Role

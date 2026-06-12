@@ -25,7 +25,23 @@ class ImageStorageService
             $this->assertS3CredentialsConfigured();
         }
 
-        $name = Str::ulid().'.'.$file->getClientOriginalExtension();
+        $realMime = mime_content_type($file->getRealPath()) ?: $file->getMimeType() ?: 'application/octet-stream';
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+        if (! in_array($realMime, $allowed, true)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'image' => ["Invalid image format. SVG and non-image files are strictly prohibited."],
+            ]);
+        }
+
+        $extension = match ($realMime) {
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        };
+
+        $name = Str::ulid().'.'.$extension;
         $path = "images/{$folder}/{$name}";
 
         /** @var FilesystemAdapter $disk */
