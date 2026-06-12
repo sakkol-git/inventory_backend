@@ -33,7 +33,7 @@ class AchievementController extends Controller
         $achievements = $this->crudService->listItems(
             modelOrQuery: Achievement::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             with: ['users:id'],
         );
 

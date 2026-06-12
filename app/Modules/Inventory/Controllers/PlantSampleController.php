@@ -27,7 +27,7 @@ class PlantSampleController extends Controller
         $samples = $this->crudService->listItems(
             modelOrQuery: PlantSample::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             with: ['plantVariety', 'contributor', 'stocks'],
             filterMap: [
                 'variety_id' => 'plant_variety_id',

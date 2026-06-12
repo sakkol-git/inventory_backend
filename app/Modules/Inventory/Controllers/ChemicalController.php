@@ -29,7 +29,7 @@ class ChemicalController extends Controller
         $chemicals = $this->crudService->listItems(
             modelOrQuery: Chemical::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             filterMap: [
                 'category' => 'category',
             ],

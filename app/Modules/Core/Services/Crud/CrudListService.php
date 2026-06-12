@@ -17,7 +17,7 @@ class CrudListService
     public function listItems(
         string|Builder $modelOrQuery,
         Request $request,
-        int $perPage = 15,
+        int $perPage = 8,
         array $with = [],
         array $filterMap = [],
         array $valueScopeMap = [],

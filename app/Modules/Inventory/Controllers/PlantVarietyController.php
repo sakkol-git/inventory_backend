@@ -30,7 +30,7 @@ class PlantVarietyController extends Controller
         $plantVariety = $this->crudService->listItems(
             modelOrQuery: PlantVariety::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             with: ['plantSpecies'],
             filterMap: ['species_id' => 'plant_species_id'],
         );

@@ -28,7 +28,7 @@ class PlantSpeciesController extends Controller
         $species = $this->crudService->listItems(
             modelOrQuery: PlantSpecies::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             filterMap: ['family' => 'family'],
         );
 

@@ -29,7 +29,7 @@ class EquipmentController extends Controller
         $equipment = $this->crudService->listItems(
             modelOrQuery: Equipment::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             filterMap: [
                 'category' => 'category',
                 'status' => 'status',

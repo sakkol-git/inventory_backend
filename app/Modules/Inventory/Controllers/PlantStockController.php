@@ -26,7 +26,7 @@ class PlantStockController extends Controller
         $stocks = $this->crudService->listItems(
             modelOrQuery: PlantStock::class,
             request: $request,
-            perPage: 10,
+            perPage: 8,
             with: ['sample'],
             filterMap: [
                 'sample_id' => 'plant_sample_id',
