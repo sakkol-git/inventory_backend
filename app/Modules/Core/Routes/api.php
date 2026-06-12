@@ -58,9 +58,15 @@ Route::middleware('auth:api')->group(function () {
     // ─── Role & Permission Management (admin only) ───────────────────────────
     Route::middleware('admin')->group(function () {
 
+        Route::apiResource('roles', RoleController::class);
+
         Route::get('roles/{id}/permissions', [RoleController::class, 'permissions']);
         Route::post('roles/{id}/permissions', [RoleController::class, 'assignPermission']);
         Route::delete('roles/{id}/permissions/{permission}', [RoleController::class, 'revokePermission']);
+
+        Route::get('roles/{id}/users', [RoleController::class, 'users']);
+        Route::post('roles/{id}/users', [RoleController::class, 'assignToUser']);
+        Route::delete('roles/{id}/users/{user}', [RoleController::class, 'revokeFromUser']);
 
         Route::apiResource('permissions', PermissionController::class)->except(['create', 'edit', 'delete']);
     });
