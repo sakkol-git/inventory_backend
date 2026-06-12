@@ -28,7 +28,7 @@ class PlantVarietyController extends Controller
         $this->authorize('viewAny', PlantVariety::class);
 
         $plantVariety = $this->crudService->listItems(
-            modelClass: PlantVariety::class,
+            modelOrQuery: PlantVariety::class,
             request: $request,
             perPage: 10,
             with: ['plantSpecies'],

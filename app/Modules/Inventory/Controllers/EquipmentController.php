@@ -27,7 +27,7 @@ class EquipmentController extends Controller
     {
         $this->authorize('viewAny', Equipment::class);
         $equipment = $this->crudService->listItems(
-            modelClass: Equipment::class,
+            modelOrQuery: Equipment::class,
             request: $request,
             perPage: 10,
             filterMap: [

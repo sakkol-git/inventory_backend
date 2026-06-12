@@ -27,7 +27,7 @@ class ChemicalController extends Controller
     {
         $this->authorize('viewAny', Chemical::class);
         $chemicals = $this->crudService->listItems(
-            modelClass: Chemical::class,
+            modelOrQuery: Chemical::class,
             request: $request,
             perPage: 10,
             filterMap: [

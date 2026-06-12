@@ -26,7 +26,7 @@ class PlantSpeciesController extends Controller
         $this->authorize('viewAny', PlantSpecies::class);
 
         $species = $this->crudService->listItems(
-            modelClass: PlantSpecies::class,
+            modelOrQuery: PlantSpecies::class,
             request: $request,
             perPage: 10,
             filterMap: ['family' => 'family'],

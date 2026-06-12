@@ -25,7 +25,7 @@ class PlantSampleController extends Controller
     {
         $this->authorize('viewAny', PlantSample::class);
         $samples = $this->crudService->listItems(
-            modelClass: PlantSample::class,
+            modelOrQuery: PlantSample::class,
             request: $request,
             perPage: 10,
             with: ['plantVariety', 'contributor', 'stocks'],

@@ -31,7 +31,7 @@ class AchievementController extends Controller
         $this->authorize('viewAny', Achievement::class);
 
         $achievements = $this->crudService->listItems(
-            modelClass: Achievement::class,
+            modelOrQuery: Achievement::class,
             request: $request,
             perPage: 10,
             with: ['users:id'],

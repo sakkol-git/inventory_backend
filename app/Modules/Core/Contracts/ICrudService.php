@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 interface ICrudService
 {
     public function listItems(
-        string $modelClass,
+        string|\Illuminate\Database\Eloquent\Builder $modelOrQuery,
         Request $request,
         int $perPage = 15,
         array $with = [],

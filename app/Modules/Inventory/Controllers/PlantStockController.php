@@ -24,7 +24,7 @@ class PlantStockController extends Controller
     {
         $this->authorize('viewAny', PlantStock::class);
         $stocks = $this->crudService->listItems(
-            modelClass: PlantStock::class,
+            modelOrQuery: PlantStock::class,
             request: $request,
             perPage: 10,
             with: ['sample'],

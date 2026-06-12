@@ -18,7 +18,7 @@ class CrudService implements ICrudService
     ) {}
 
     public function listItems(
-        string $modelClass,
+        string|\Illuminate\Database\Eloquent\Builder $modelOrQuery,
         Request $request,
         int $perPage = 15,
         array $with = [],
@@ -29,7 +29,7 @@ class CrudService implements ICrudService
         string $defaultSortDir = 'desc',
     ): LengthAwarePaginator {
         return $this->listService->listItems(
-            modelClass: $modelClass,
+            modelOrQuery: $modelOrQuery,
             request: $request,
             perPage: $perPage,
             with: $with,
