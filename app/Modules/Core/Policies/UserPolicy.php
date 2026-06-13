@@ -8,6 +8,7 @@ use App\Modules\Core\Models\User;
 
 class UserPolicy
 {
+    
     public function viewAny(User $user): bool
     {
         return $user->hasPermissionTo('users.view', 'api');

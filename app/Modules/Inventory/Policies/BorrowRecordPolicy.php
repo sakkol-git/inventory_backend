@@ -47,9 +47,9 @@ class BorrowRecordPolicy
     {
         $active = [BorrowStatus::APPROVED, BorrowStatus::BORROWED, BorrowStatus::OVERDUE];
 
-        if (in_array($record->status, $active, true) && $user->id === $record->user_id) {
-            return true;
-        }
+        // if (in_array($record->status, $active, true) && $user->id === $record->user_id) {
+        //     return true;
+        // }
 
         return $this->canManage($user);
     }
