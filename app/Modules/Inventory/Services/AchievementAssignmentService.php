@@ -102,9 +102,11 @@ class AchievementAssignmentService
     public function assignToUser(Achievement $achievement, User $user): void
     {
         DB::transaction(function () use ($achievement, $user): void {
-            $achievement->users()->attach($user->id, [
-                'earned_at' => now(),
-            ]);
+            if (! $achievement->users()->where('user_id', $user->id)->exists()) {
+                $achievement->users()->attach($user->id, [
+                    'earned_at' => now(),
+                ]);
+            }
         });
     }
 
