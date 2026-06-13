@@ -32,6 +32,11 @@ class PlantSampleController extends Controller
             $query = PlantSample::where('user_id', $user->id);
         }
 
+        $userIdFilter = $request->query('user_id');
+        if ($userIdFilter === 'me') {
+            $request->merge(['user_id' => $user->id]);
+        }
+
         $samples = $this->crudService->listItems(
             modelOrQuery: $query,
             request: $request,
@@ -40,6 +45,7 @@ class PlantSampleController extends Controller
             filterMap: [
                 'variety_id' => 'plant_variety_id',
                 'status' => 'status',
+                'user_id' => 'user_id',
             ],
         );
 

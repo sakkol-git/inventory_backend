@@ -30,8 +30,20 @@ class AchievementController extends Controller
     {
         $this->authorize('viewAny', Achievement::class);
 
+        $query = Achievement::query();
+
+        if ($request->has('user_id')) {
+            $userId = $request->query('user_id');
+            if ($userId === 'me') {
+                $userId = auth('api')->id();
+            }
+            $query->whereHas('users', function ($q) use ($userId) {
+                $q->where('users.id', $userId);
+            });
+        }
+
         $achievements = $this->crudService->listItems(
-            modelOrQuery: Achievement::class,
+            modelOrQuery: $query,
             request: $request,
             perPage: 8,
             with: ['users:id'],
