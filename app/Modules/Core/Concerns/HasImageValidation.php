@@ -21,7 +21,22 @@ trait HasImageValidation
     protected function imageRules(): array
     {
         return [
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => [
+                'nullable',
+                'file',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $allowed = ['image/jpeg', 'image/png', 'image/webp'];
+                        $clientMime = $value->getClientMimeType();
+                        $clientExt = strtolower($value->getClientOriginalExtension());
+                        
+                        if (!in_array($clientMime, $allowed) && !in_array($clientExt, ['jpg', 'jpeg', 'png', 'webp'])) {
+                            $fail('The image field must be a file of type: jpg, jpeg, png, webp.');
+                        }
+                    }
+                },
+            ],
             'image_url' => ['nullable', 'url', 'max:2048'],
             'profile_image_url' => ['nullable', 'url', 'max:2048'],
         ];
