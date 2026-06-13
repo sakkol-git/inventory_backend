@@ -113,7 +113,7 @@ class AchievementController extends Controller
 
         return response()->json([
             'message' => 'Achievement assigned successfully.',
-            'achievement' => new AchievementResource($achievement->load('users:id')),
+            'data' => new AchievementResource($achievement->load('users:id')),
         ]);
     }
 
