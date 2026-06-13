@@ -48,8 +48,9 @@ class UserDocumentService
                     'status' => 'processing',
                 ]);
 
-                // 3. Dispatch job to move file to final storage
-                ProcessDocumentUploadJob::dispatch($document->id, $tempPath, $finalPath);
+                // 3. Dispatch job synchronously to move file to final storage.
+                // This ensures the document doesn't get stuck in 'processing' if a queue worker isn't running.
+                ProcessDocumentUploadJob::dispatchSync($document->id, $tempPath, $finalPath);
 
                 return $document;
             });
