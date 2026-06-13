@@ -31,20 +31,20 @@ class ProcessDocumentUploadJob implements ShouldQueue
     {
         $document = UserDocument::find($this->documentId);
         if (!$document) {
-            Storage::disk('local')->delete($this->tempPath);
+            Storage::disk('private')->delete($this->tempPath);
             return;
         }
 
         try {
-            // Read from local temp storage and write to private storage (which could be S3)
-            $fileContents = Storage::disk('local')->get($this->tempPath);
+            // Read from private temp storage and write to final destination (could be moving within S3)
+            $fileContents = Storage::disk('private')->get($this->tempPath);
             Storage::disk('private')->put($this->finalPath, $fileContents);
 
             // Update document status
             $document->update(['status' => 'active', 'file_path' => $this->finalPath]);
 
             // Clean up temp file
-            Storage::disk('local')->delete($this->tempPath);
+            Storage::disk('private')->delete($this->tempPath);
         } catch (Throwable $e) {
             $document->update(['status' => 'failed']);
             throw $e;

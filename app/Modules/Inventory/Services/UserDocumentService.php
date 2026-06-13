@@ -22,12 +22,12 @@ class UserDocumentService
      */
     public function create(UploadedFile $file, array $data, int $userId): UserDocument
     {
-        // 1. Store temporarily on local disk
+        // 1. Store temporarily on private disk (shared across containers)
         $tempPath = $this->fileUploadService->validateAndStore(
             file: $file,
             context: 'document',
             folder: 'temp_documents',
-            disk: 'local'
+            disk: 'private'
         );
 
         try {
@@ -54,8 +54,8 @@ class UserDocumentService
                 return $document;
             });
         } catch (Throwable $throwable) {
-            // Clean up temporary local file if DB transaction fails
-            Storage::disk('local')->delete($tempPath);
+            // Clean up temporary file if DB transaction fails
+            Storage::disk('private')->delete($tempPath);
 
             throw $throwable;
         }
