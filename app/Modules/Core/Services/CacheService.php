@@ -68,6 +68,7 @@ class CacheService
     }
 
     /**
+    /**
      * Invalidate everything (e.g. after seeding or major changes).
      */
     public static function flush(): void

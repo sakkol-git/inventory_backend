@@ -31,6 +31,12 @@ class ProfileService
      */
     public function update(User $user, array $data): User
     {
+        if (isset($data['image'])) {
+            $path = $data['image']->store('profiles', 'public');
+            $data['profile_image_url'] = url("storage/{$path}");
+            unset($data['image']);
+        }
+
         $user->update($data);
 
         return $user->refresh();

@@ -46,6 +46,7 @@ Route::middleware('auth:api')->group(function () {
     // ─── Profile Management ──────────────────────────────────────────────────
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::post('/', [ProfileController::class, 'update'])->name('update.post');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
         Route::get('contributions', [ProfileController::class, 'contributions'])->name('contributions');
         Route::get('achievements', [ProfileController::class, 'achievements'])->name('achievements');
