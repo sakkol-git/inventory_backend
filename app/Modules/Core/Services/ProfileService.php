@@ -8,10 +8,14 @@ use App\Modules\Core\Models\User;
 use App\Modules\Inventory\Models\BorrowRecord;
 use App\Modules\Inventory\Models\ChemicalUsageLog;
 use App\Modules\Inventory\Models\Transaction;
+use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use Illuminate\Support\Collection;
 
 class ProfileService
 {
+    public function __construct(
+        private readonly ImageUploadService $imageService
+    ) {}
     /**
      * Get the full profile data for a user.
      */
@@ -31,11 +35,7 @@ class ProfileService
      */
     public function update(User $user, array $data): User
     {
-        if (isset($data['image'])) {
-            $path = $data['image']->store('profiles', 'public');
-            $data['profile_image_url'] = url("storage/{$path}");
-            unset($data['image']);
-        }
+        $data = $this->imageService->prepareDataForPersistence($data, clone $user, $user);
 
         $user->update($data);
 
