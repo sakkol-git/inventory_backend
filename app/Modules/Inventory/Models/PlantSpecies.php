@@ -16,13 +16,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class PlantSpecies extends Model
 {
     /** @use HasFactory<PlantSpeciesFactory> */
     use EscapesSearchTerm, HasActivityLogging, HasFactory, HasImageUpload, HasTransactions, SoftDeletes;
-
     protected $table = 'plant_species';
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::tags(['plant_species'])->flush());
+        static::deleted(fn () => Cache::tags(['plant_species'])->flush());
+    }
 
     protected $fillable = [
         'common_name',

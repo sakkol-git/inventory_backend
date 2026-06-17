@@ -38,11 +38,13 @@ class UserDocumentWorkflowTest extends TestCase
         Schema::create('user_documents', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id');
+            $table->foreignId('achievement_id')->nullable();
             $table->string('title');
             $table->string('file_path');
             $table->string('file_type', 20);
             $table->unsignedInteger('file_size');
             $table->text('description')->nullable();
+            $table->string('status')->default('pending');
             $table->softDeletes();
             $table->timestamps();
         });

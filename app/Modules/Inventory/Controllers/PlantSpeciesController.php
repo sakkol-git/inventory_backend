@@ -13,6 +13,7 @@ use App\Modules\Inventory\Resources\PlantSpeciesResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 class PlantSpeciesController extends Controller
 {
@@ -25,12 +26,16 @@ class PlantSpeciesController extends Controller
     {
         $this->authorize('viewAny', PlantSpecies::class);
 
-        $species = $this->crudService->listItems(
-            modelOrQuery: PlantSpecies::class,
-            request: $request,
-            perPage: 8,
-            filterMap: ['family' => 'family'],
-        );
+        $cacheKey = 'plant_species_list_' . md5(json_encode($request->all()));
+
+        $species = Cache::tags(['plant_species'])->remember($cacheKey, 3600, function () use ($request) {
+            return $this->crudService->listItems(
+                modelOrQuery: PlantSpecies::class,
+                request: $request,
+                perPage: 8,
+                filterMap: ['family' => 'family'],
+            );
+        });
 
         return PlantSpeciesResource::collection($species);
     }

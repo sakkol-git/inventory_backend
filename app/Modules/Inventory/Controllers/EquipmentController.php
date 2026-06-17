@@ -13,6 +13,7 @@ use App\Modules\Inventory\Resources\EquipmentResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 class EquipmentController extends Controller
 {
@@ -31,19 +32,23 @@ class EquipmentController extends Controller
         // Therefore, we intentionally do NOT scope the query to the authenticated user.
         // All authenticated users can view the full equipment inventory to check availability.
         
-        $equipment = $this->crudService->listItems(
-            modelOrQuery: Equipment::class,
-            request: $request,
-            perPage: 8,
-            filterMap: [
-                'category' => 'category',
-                'status' => 'status',
-            ],
-            booleanScopeMap: [
-                'available_only' => 'available',
-                'borrowed_only' => 'borrowed',
-            ],
-        );
+        $cacheKey = 'equipment_list_' . md5(json_encode($request->all()));
+
+        $equipment = Cache::tags(['equipment'])->remember($cacheKey, 3600, function () use ($request) {
+            return $this->crudService->listItems(
+                modelOrQuery: Equipment::class,
+                request: $request,
+                perPage: 8,
+                filterMap: [
+                    'category' => 'category',
+                    'status' => 'status',
+                ],
+                booleanScopeMap: [
+                    'available_only' => 'available',
+                    'borrowed_only' => 'borrowed',
+                ],
+            );
+        });
 
         return EquipmentResource::collection($equipment);
     }

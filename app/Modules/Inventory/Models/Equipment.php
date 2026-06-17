@@ -16,12 +16,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class Equipment extends Model
 {
     use EscapesSearchTerm, HasActivityLogging, HasFactory, HasImageUpload, HasTransactions, SoftDeletes;
-
     protected $table = 'equipment';
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::tags(['equipment'])->flush());
+        static::deleted(fn () => Cache::tags(['equipment'])->flush());
+    }
 
     protected $fillable = [
         'equipment_name',

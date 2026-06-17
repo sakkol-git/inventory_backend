@@ -17,8 +17,8 @@ class AuthFeatureTest extends TestCase
         $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'password' => 'Password123!',
-            'password_confirmation' => 'Password123!',
+            'password' => 'UnCompromisedPass!@123',
+            'password_confirmation' => 'UnCompromisedPass!@123',
             'phone' => '1234567890',
         ]);
 

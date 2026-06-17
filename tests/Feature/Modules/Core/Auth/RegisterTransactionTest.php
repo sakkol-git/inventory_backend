@@ -23,8 +23,8 @@ class RegisterTransactionTest extends TestCase
         $payload = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'password' => 'Password123!',
-            'password_confirmation' => 'Password123!',
+            'password' => 'UnCompromisedPass!@123',
+            'password_confirmation' => 'UnCompromisedPass!@123',
         ];
 
         try {
@@ -44,8 +44,8 @@ class RegisterTransactionTest extends TestCase
         $payload = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'password' => 'Password123!',
-            'password_confirmation' => 'Password123!',
+            'password' => 'UnCompromisedPass!@123',
+            'password_confirmation' => 'UnCompromisedPass!@123',
         ];
 
         $response = $this->postJson('/api/v1/auth/register', $payload);

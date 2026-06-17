@@ -24,7 +24,7 @@ return new class extends Migration
 
             // Classification Info
             $table->string('family')->nullable();
-            $table->enum('growth_type', ['annual', 'perennial', 'biennial'])->nullable();
+            $table->enum('growth_type', ['herb', 'shrub', 'tree', 'vine', 'grass', 'aquatic', 'other'])->nullable();
             $table->string('native_region')->nullable();
             $table->string('propagation_method')->nullable();
 
