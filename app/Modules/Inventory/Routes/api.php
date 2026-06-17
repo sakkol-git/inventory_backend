@@ -78,7 +78,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('user-documents/{userDocument}/download', [UserDocumentController::class, 'download'])
         ->name('user-documents.download');
     Route::apiResource('user-documents', UserDocumentController::class)
-        ->only(['index', 'store', 'show', 'destroy'])
+        ->only(['index', 'store', 'show', 'update', 'destroy'])
         ->parameters(['user-documents' => 'userDocument']);
 
 });

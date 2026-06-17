@@ -64,6 +64,48 @@ class UserDocumentService
     }
 
     /**
+     * Update an existing user document.
+     */
+    public function update(UserDocument $document, ?UploadedFile $file, array $data): UserDocument
+    {
+        return DB::transaction(function () use ($document, $file, $data) {
+            $document->fill(array_filter([
+                'title' => $data['title'] ?? null,
+                'file_type' => $data['file_type'] ?? null,
+                'description' => $data['description'] ?? null,
+                'achievement_id' => array_key_exists('achievement_id', $data) ? $data['achievement_id'] : null,
+            ], fn ($value) => $value !== null));
+
+            if ($file) {
+                // Store temporarily on private disk
+                $tempPath = $this->fileUploadService->validateAndStore(
+                    file: $file,
+                    context: 'document',
+                    folder: 'temp_documents',
+                    disk: 'private'
+                );
+
+                $finalFilename = basename($tempPath);
+                $finalPath = 'documents/' . $finalFilename;
+
+                // Mark as processing while the job runs
+                $document->status = 'processing';
+                $document->file_path = $finalPath;
+                $document->file_size = $file->getSize();
+
+                // Save before dispatching
+                $document->save();
+
+                ProcessDocumentUploadJob::dispatchSync($document->id, $tempPath, $finalPath);
+            } else {
+                $document->save();
+            }
+
+            return $document;
+        });
+    }
+
+    /**
      * Delete a user document and its physical file.
      */
     public function delete(UserDocument $document): void

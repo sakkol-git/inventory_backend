@@ -8,6 +8,7 @@ use App\Modules\Core\Concerns\EscapesSearchTerm;
 use App\Modules\Core\Http\Controllers\Controller;
 use App\Modules\Inventory\Models\UserDocument;
 use App\Modules\Inventory\Requests\UserDocument\StoreUserDocumentRequest;
+use App\Modules\Inventory\Requests\UserDocument\UpdateUserDocumentRequest;
 use App\Modules\Inventory\Resources\UserDocumentResource;
 use App\Modules\Inventory\Services\UserDocumentService;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -71,6 +72,24 @@ class UserDocumentController extends Controller
         return (new UserDocumentResource($document))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * PUT/PATCH /api/user-documents/{userDocument}
+     */
+    public function update(UpdateUserDocumentRequest $request, UserDocument $userDocument): JsonResponse
+    {
+        $this->authorize('update', $userDocument);
+
+        $document = $this->userDocumentService->update(
+            document: $userDocument,
+            file: $request->file('file'),
+            data: $request->validated(),
+        );
+
+        return (new UserDocumentResource($document))
+            ->response()
+            ->setStatusCode(200);
     }
 
     /**
