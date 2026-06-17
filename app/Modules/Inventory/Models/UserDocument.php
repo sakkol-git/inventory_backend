@@ -21,6 +21,7 @@ class UserDocument extends Model
 
     protected $fillable = [
         'user_id',
+        'achievement_id',
         'title',
         'file_path',
         'file_type',
@@ -50,5 +51,10 @@ class UserDocument extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function achievement(): BelongsTo
+    {
+        return $this->belongsTo(Achievement::class);
     }
 }

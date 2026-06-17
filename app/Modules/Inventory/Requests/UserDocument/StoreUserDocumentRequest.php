@@ -22,6 +22,7 @@ class StoreUserDocumentRequest extends FormRequest
             'file' => ['required', 'file', 'max:10240'],
             'file_type' => ['nullable', 'string', 'max:50', 'in:document,pdf,image,certificate,other'],
             'description' => ['nullable', 'string'],
+            'achievement_id' => ['nullable', 'exists:achievements,id'],
         ];
     }
 }

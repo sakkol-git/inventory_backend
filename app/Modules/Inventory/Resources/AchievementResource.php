@@ -7,6 +7,7 @@ namespace App\Modules\Inventory\Resources;
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Modules\Inventory\Resources\UserDocumentResource;
 
 class AchievementResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class AchievementResource extends JsonResource
             ],
             'image' => ImageUploadService::resolveImageUrl($this->image_path, $this->image_url),
             'assigned_user_ids' => $this->whenLoaded('users', fn () => $this->users->pluck('id')->values()),
+            'user_documents' => UserDocumentResource::collection($this->whenLoaded('userDocuments')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

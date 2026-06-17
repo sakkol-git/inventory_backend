@@ -44,4 +44,9 @@ class Achievement extends Model
             ->withPivot('earned_at')
             ->withTimestamps();
     }
+
+    public function userDocuments(): HasMany
+    {
+        return $this->hasMany(UserDocument::class);
+    }
 }

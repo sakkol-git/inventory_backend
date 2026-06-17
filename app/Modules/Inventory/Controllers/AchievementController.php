@@ -76,7 +76,7 @@ class AchievementController extends Controller
     {
         $this->authorize('view', $achievement);
 
-        return new AchievementResource($achievement->load('users:id'));
+        return new AchievementResource($achievement->load(['users:id', 'userDocuments']));
     }
 
     /**

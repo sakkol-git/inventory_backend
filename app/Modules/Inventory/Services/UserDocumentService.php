@@ -40,6 +40,7 @@ class UserDocumentService
 
                 $document = UserDocument::create([
                     'user_id' => $userId,
+                    'achievement_id' => $data['achievement_id'] ?? null,
                     'title' => $data['title'],
                     'file_path' => $finalPath,
                     'file_type' => $data['file_type'] ?? 'document',
