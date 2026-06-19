@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use App\Modules\Core\Services\CacheService;
 
 class Equipment extends Model
 {
@@ -25,8 +26,8 @@ class Equipment extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::tags(['equipment'])->flush());
-        static::deleted(fn () => Cache::tags(['equipment'])->flush());
+        static::saved(fn () => CacheService::flushTags(['equipment']));
+        static::deleted(fn () => CacheService::flushTags(['equipment']));
     }
 
     protected $fillable = [

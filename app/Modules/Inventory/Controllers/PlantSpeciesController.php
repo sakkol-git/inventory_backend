@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Cache;
+use App\Modules\Core\Services\CacheService;
 
 class PlantSpeciesController extends Controller
 {
@@ -28,7 +29,7 @@ class PlantSpeciesController extends Controller
 
         $cacheKey = 'plant_species_list_' . md5(json_encode($request->all()));
 
-        $species = Cache::tags(['plant_species'])->remember($cacheKey, 3600, function () use ($request) {
+        $species = CacheService::rememberWithTags(['plant_species'], $cacheKey, 3600, function () use ($request) {
             return $this->crudService->listItems(
                 modelOrQuery: PlantSpecies::class,
                 request: $request,

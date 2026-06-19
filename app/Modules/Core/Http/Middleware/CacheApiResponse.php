@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
+use App\Modules\Core\Services\CacheService;
 
 /**
  * Cache GET API responses for read-heavy endpoints.
@@ -31,7 +32,7 @@ class CacheApiResponse
         $prefix = $this->getRoutePrefix($request);
         $tags = array_filter(['api_cache', $prefix ? "api_cache:{$prefix}" : null]);
 
-        return Cache::tags($tags)->remember($cacheKey, $ttl, function () use ($request, $next): Response {
+        return CacheService::rememberWithTags($tags, $cacheKey, $ttl, function () use ($request, $next): Response {
             return $next($request);
         });
     }
@@ -48,12 +49,12 @@ class CacheApiResponse
         $prefix = $this->getRoutePrefix($request);
 
         if ($prefix) {
-            Cache::tags(["api_cache:{$prefix}"])->flush();
+            CacheService::flushTags(["api_cache:{$prefix}"]);
         }
 
         // Also bust the dashboard cache since it aggregates across scopes
         if ($prefix !== 'dashboard') {
-            Cache::tags(['api_cache:dashboard'])->flush();
+            CacheService::flushTags(['api_cache:dashboard']);
         }
     }
 

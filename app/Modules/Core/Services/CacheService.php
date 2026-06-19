@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
  * Each "scope" corresponds to a group of related endpoints.
  * When data changes, call invalidate() with the relevant scope(s).
  *
- * Uses Redis cache tags for reliable, atomic invalidation.
+ * Uses Cache Tags if supported, falling back to Tag Versioning if not.
  */
 class CacheService
 {
@@ -27,6 +27,58 @@ class CacheService
     public const LONG_TTL = 900;
 
     /**
+     * Check if the current cache store supports native tags.
+     */
+    public static function supportsTags(): bool
+    {
+        return Cache::getStore() instanceof \Illuminate\Cache\TaggableStore;
+    }
+
+    /**
+     * Generate a versioned key for tag fallback emulation.
+     */
+    private static function getVersionedKey(string $key, array $tags): string
+    {
+        $versions = [];
+        foreach ($tags as $tag) {
+            $versions[] = Cache::get("tag_version_{$tag}", 1);
+        }
+        return $key . '_v_' . implode('_', $versions);
+    }
+
+    /**
+     * Safely remember a cached value using tags if available, or tag versioning fallback.
+     */
+    public static function rememberWithTags(array $tags, string $key, int $ttl, \Closure $callback): mixed
+    {
+        if (self::supportsTags()) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
+        }
+
+        $versionedKey = self::getVersionedKey($key, $tags);
+        return Cache::remember($versionedKey, $ttl, $callback);
+    }
+
+    /**
+     * Safely flush tags using native tags if available, or tag versioning fallback.
+     */
+    public static function flushTags(array $tags): void
+    {
+        if (self::supportsTags()) {
+            Cache::tags($tags)->flush();
+            return;
+        }
+
+        foreach ($tags as $tag) {
+            $versionKey = "tag_version_{$tag}";
+            if (!Cache::has($versionKey)) {
+                Cache::put($versionKey, 1);
+            }
+            Cache::increment($versionKey);
+        }
+    }
+
+    /**
      * Get data from cache or compute it.
      *
      * @template T
@@ -39,7 +91,7 @@ class CacheService
         $scope = self::extractScope($key);
         $tags = $scope ? [$scope, 'api'] : ['api'];
 
-        return Cache::tags($tags)->remember($key, $ttl, $callback);
+        return self::rememberWithTags($tags, $key, $ttl, $callback);
     }
 
     /**
@@ -58,22 +110,21 @@ class CacheService
     public static function invalidate(string ...$scopes): void
     {
         foreach ($scopes as $scope) {
-            Cache::tags([$scope])->flush();
+            self::flushTags([$scope]);
         }
 
         // Always bust the dashboard since it aggregates across scopes
         if (! in_array('dashboard', $scopes, true)) {
-            Cache::tags(['dashboard'])->flush();
+            self::flushTags(['dashboard']);
         }
     }
 
-    /**
     /**
      * Invalidate everything (e.g. after seeding or major changes).
      */
     public static function flush(): void
     {
-        Cache::tags(['api'])->flush();
+        self::flushTags(['api']);
     }
 
     /**

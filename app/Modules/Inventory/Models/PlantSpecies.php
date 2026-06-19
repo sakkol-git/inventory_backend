@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use App\Modules\Core\Services\CacheService;
 
 class PlantSpecies extends Model
 {
@@ -26,8 +27,8 @@ class PlantSpecies extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::tags(['plant_species'])->flush());
-        static::deleted(fn () => Cache::tags(['plant_species'])->flush());
+        static::saved(fn () => CacheService::flushTags(['plant_species']));
+        static::deleted(fn () => CacheService::flushTags(['plant_species']));
     }
 
     protected $fillable = [

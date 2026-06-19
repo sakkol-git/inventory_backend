@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Cache;
+use App\Modules\Core\Services\CacheService;
 
 class EquipmentController extends Controller
 {
@@ -34,7 +35,7 @@ class EquipmentController extends Controller
         
         $cacheKey = 'equipment_list_' . md5(json_encode($request->all()));
 
-        $equipment = Cache::tags(['equipment'])->remember($cacheKey, 3600, function () use ($request) {
+        $equipment = CacheService::rememberWithTags(['equipment'], $cacheKey, 3600, function () use ($request) {
             return $this->crudService->listItems(
                 modelOrQuery: Equipment::class,
                 request: $request,
