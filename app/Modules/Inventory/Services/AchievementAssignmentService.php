@@ -69,7 +69,11 @@ class AchievementAssignmentService
             return $defaultToEmpty ? [] : null;
         }
 
-        $userIds = array_map('intval', (array) $data['user_ids']);
+       $userIds = array_values(
+                  array_unique(
+                 array_map('intval', (array) $data['user_ids'])
+                )
+              );
         unset($data['user_ids']);
 
         return $userIds;

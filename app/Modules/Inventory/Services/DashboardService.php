@@ -111,6 +111,9 @@ class DashboardService
                 'chemicals_by_category' => Chemical::selectRaw('category, COUNT(*) as count')
                     ->groupBy('category')
                     ->pluck('count', 'category'),
+                'samples_by_status' => PlantSample::selectRaw('status, COUNT(*) as count')
+                    ->groupBy('status')
+                    ->pluck('count', 'status'),
             ];
         });
     }

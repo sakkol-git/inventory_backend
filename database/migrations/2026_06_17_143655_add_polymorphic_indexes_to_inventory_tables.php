@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->index(['item_type', 'item_id'], 'transactions_item_type_id_index');
+            $table->index(['transactionable_type', 'transactionable_id'], 'transactions_transactionable_type_id_index');
         });
 
         Schema::table('borrow_records', function (Blueprint $table) {
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropIndex('transactions_item_type_id_index');
+            $table->dropIndex('transactions_transactionable_type_id_index');
         });
 
         Schema::table('borrow_records', function (Blueprint $table) {
