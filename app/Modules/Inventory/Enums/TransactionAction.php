@@ -13,4 +13,7 @@ enum TransactionAction: string
     case RETURNED = 'returned';
     case HARVESTED = 'harvested';
     case DISPOSED = 'disposed';
+    case RESERVED = 'reserved';
+    case RELEASED = 'released';
+    case RESTOCKED = 'restocked';
 }

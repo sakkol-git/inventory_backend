@@ -106,7 +106,9 @@ class PlantStockController extends Controller
     public function consume(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
     {
         $this->authorize('update', $plantStock);
-        $updatedStock = $this->stockService->consume($plantStock, (int) $request->validated('quantity'));
+        /** @var \App\Modules\Core\Models\User $user */
+        $user = auth('api')->user();
+        $updatedStock = $this->stockService->consume($plantStock, (int) $request->validated('quantity'), $user);
         $updatedStock->load('sample');
         return new PlantStockResource($updatedStock);
     }
@@ -114,7 +116,9 @@ class PlantStockController extends Controller
     public function reserve(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
     {
         $this->authorize('update', $plantStock);
-        $updatedStock = $this->stockService->reserve($plantStock, (int) $request->validated('quantity'));
+        /** @var \App\Modules\Core\Models\User $user */
+        $user = auth('api')->user();
+        $updatedStock = $this->stockService->reserve($plantStock, (int) $request->validated('quantity'), $user);
         $updatedStock->load('sample');
         return new PlantStockResource($updatedStock);
     }
@@ -122,7 +126,9 @@ class PlantStockController extends Controller
     public function release(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
     {
         $this->authorize('update', $plantStock);
-        $updatedStock = $this->stockService->release($plantStock, (int) $request->validated('quantity'));
+        /** @var \App\Modules\Core\Models\User $user */
+        $user = auth('api')->user();
+        $updatedStock = $this->stockService->release($plantStock, (int) $request->validated('quantity'), $user);
         $updatedStock->load('sample');
         return new PlantStockResource($updatedStock);
     }
@@ -130,7 +136,9 @@ class PlantStockController extends Controller
     public function restock(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
     {
         $this->authorize('update', $plantStock);
-        $updatedStock = $this->stockService->restock($plantStock, (int) $request->validated('quantity'));
+        /** @var \App\Modules\Core\Models\User $user */
+        $user = auth('api')->user();
+        $updatedStock = $this->stockService->restock($plantStock, (int) $request->validated('quantity'), $user);
         $updatedStock->load('sample');
         return new PlantStockResource($updatedStock);
     }
