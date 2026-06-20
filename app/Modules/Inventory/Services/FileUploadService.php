@@ -15,7 +15,14 @@ class FileUploadService
     // Allowed MIME types per context — checked via fileinfo, NOT extension
     private const ALLOWED_MIMES = [
         'image' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-        'document' => ['application/pdf'],
+        'document' => [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+        ],
     ];
 
     // Forbidden MIME types — rejected regardless of context
@@ -111,6 +118,8 @@ class FileUploadService
             'image/webp' => 'webp',
             'image/gif' => 'gif',
             'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
             default => 'bin',
         };
     }

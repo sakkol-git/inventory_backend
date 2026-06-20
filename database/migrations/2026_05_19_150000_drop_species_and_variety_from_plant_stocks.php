@@ -28,33 +28,24 @@ return new class extends Migration
             foreach ($constraints as $constraint) {
                 try {
                     DB::statement("ALTER TABLE plant_stocks DROP FOREIGN KEY `{$constraint->CONSTRAINT_NAME}`");
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     // Ignore if the foreign key was already removed or does not exist
                 }
             }
         }
         
         if ($speciesExists || $varietyExists) {
-            Schema::table('plant_stocks', function (Blueprint $table) use ($speciesExists, $varietyExists): void {
-                try {
+            if (Schema::hasIndex('plant_stocks', 'plant_stocks_sample_idx', 'index')) {
+                Schema::table('plant_stocks', function (Blueprint $table) {
                     $table->dropIndex('plant_stocks_sample_idx');
-                } catch (Exception $e) {
-                    // index may not exist or be named differently; ignore
-                }
+                });
+            } elseif (Schema::hasIndex('plant_stocks', 'plant_stocks_sample_idx')) {
+                 Schema::table('plant_stocks', function (Blueprint $table) {
+                    $table->dropIndex('plant_stocks_sample_idx');
+                });
+            }
 
-                if (DB::getDriverName() !== 'sqlite') {
-                    if ($speciesExists) {
-                        try {
-                            $table->dropForeign(['plant_species_id']);
-                        } catch (Exception $e) {}
-                    }
-                    if ($varietyExists) {
-                        try {
-                            $table->dropForeign(['plant_variety_id']);
-                        } catch (Exception $e) {}
-                    }
-                }
-
+            Schema::table('plant_stocks', function (Blueprint $table) use ($speciesExists, $varietyExists): void {
                 if (DB::getDriverName() !== 'sqlite') {
                     if ($speciesExists) {
                         $table->dropColumn('plant_species_id');
@@ -67,13 +58,11 @@ return new class extends Migration
             });
         }
 
-        Schema::table('plant_stocks', function (Blueprint $table): void {
-            try {
+        if (!Schema::hasIndex('plant_stocks', 'plant_stocks_sample_idx')) {
+            Schema::table('plant_stocks', function (Blueprint $table): void {
                 $table->index(['plant_sample_id', 'status'], 'plant_stocks_sample_idx');
-            } catch (Exception $e) {
-                // ignore if the index already exists
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -81,13 +70,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('plant_stocks', function (Blueprint $table): void {
-            try {
+        if (Schema::hasIndex('plant_stocks', 'plant_stocks_sample_idx')) {
+            Schema::table('plant_stocks', function (Blueprint $table): void {
                 $table->dropIndex('plant_stocks_sample_idx');
-            } catch (Exception $e) {
-                // ignore if missing
-            }
+            });
+        }
 
+        Schema::table('plant_stocks', function (Blueprint $table): void {
             $table->foreignId('plant_species_id')
                 ->constrained('plant_species')
                 ->restrictOnDelete()
