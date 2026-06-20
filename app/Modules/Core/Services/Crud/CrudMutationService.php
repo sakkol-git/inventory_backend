@@ -7,7 +7,6 @@ namespace App\Modules\Core\Services\Crud;
 use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\ImageUpload\ImageUploadService;
 use App\Modules\Inventory\Enums\TransactionAction;
-use App\Exceptions\DomainException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -30,10 +29,9 @@ class CrudMutationService
         
         $lock = Cache::lock($lockKey, 3);
         if (! $lock->get()) {
-            throw new DomainException(
-                code: 'DUPLICATE_SUBMISSION',
-                message: 'A similar request is already being processed. Please wait.',
-                statusCode: 409
+            throw new \DomainException(
+                'A similar request is already being processed. Please wait.',
+                409
             );
         }
 

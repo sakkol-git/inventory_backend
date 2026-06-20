@@ -95,7 +95,7 @@ class StockService
     /**
      * Automatically set status based on current inventory levels.
      */
-    private function syncStatus(PlantStock $stock): void
+    public function syncStatus(PlantStock $stock): void
     {
         $stock->refresh();
 

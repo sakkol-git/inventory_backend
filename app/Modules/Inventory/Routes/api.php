@@ -31,6 +31,12 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('plant-samples', PlantSampleController::class)
         ->parameters(['plant-samples' => 'plantSample']);
 
+    Route::prefix('plant-stocks/{plantStock}')->name('plant-stocks.')->group(function () {
+        Route::post('consume', [PlantStockController::class, 'consume'])->name('consume');
+        Route::post('reserve', [PlantStockController::class, 'reserve'])->name('reserve');
+        Route::post('release', [PlantStockController::class, 'release'])->name('release');
+        Route::post('restock', [PlantStockController::class, 'restock'])->name('restock');
+    });
     Route::apiResource('plant-stocks', PlantStockController::class)
         ->parameters(['plant-stocks' => 'plantStock']);
 

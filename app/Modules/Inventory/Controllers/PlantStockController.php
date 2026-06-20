@@ -7,9 +7,11 @@ namespace App\Modules\Inventory\Controllers;
 use App\Modules\Core\Contracts\ICrudService;
 use App\Modules\Core\Http\Controllers\Controller;
 use App\Modules\Inventory\Models\PlantStock;
+use App\Modules\Inventory\Requests\Stock\AdjustPlantStockRequest;
 use App\Modules\Inventory\Requests\Stock\StorePlantStockRequest;
 use App\Modules\Inventory\Requests\Stock\UpdatePlantStockRequest;
 use App\Modules\Inventory\Resources\PlantStockResource;
+use App\Modules\Inventory\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,6 +20,7 @@ class PlantStockController extends Controller
 {
     public function __construct(
         private readonly ICrudService $crudService,
+        private readonly StockService $stockService,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -46,6 +49,8 @@ class PlantStockController extends Controller
             data: $request->validated(),
             user: auth('api')->user(),
         );
+
+        $this->stockService->syncStatus($stock);
 
         $stock->load('sample');
 
@@ -82,16 +87,52 @@ class PlantStockController extends Controller
                 abort(422, 'Reserved quantity cannot exceed the total quantity.');
             }
 
-            return $this->crudService->update(
+            $updatedStock = $this->crudService->update(
                 instance: $lockedStock,
                 data: $data,
                 user: auth('api')->user(),
             );
+
+            $this->stockService->syncStatus($updatedStock);
+
+            return $updatedStock;
         });
 
         $plantStock->load('sample');
 
         return new PlantStockResource($plantStock);
+    }
+
+    public function consume(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
+    {
+        $this->authorize('update', $plantStock);
+        $updatedStock = $this->stockService->consume($plantStock, (int) $request->validated('quantity'));
+        $updatedStock->load('sample');
+        return new PlantStockResource($updatedStock);
+    }
+
+    public function reserve(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
+    {
+        $this->authorize('update', $plantStock);
+        $updatedStock = $this->stockService->reserve($plantStock, (int) $request->validated('quantity'));
+        $updatedStock->load('sample');
+        return new PlantStockResource($updatedStock);
+    }
+
+    public function release(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
+    {
+        $this->authorize('update', $plantStock);
+        $updatedStock = $this->stockService->release($plantStock, (int) $request->validated('quantity'));
+        $updatedStock->load('sample');
+        return new PlantStockResource($updatedStock);
+    }
+
+    public function restock(AdjustPlantStockRequest $request, PlantStock $plantStock): PlantStockResource
+    {
+        $this->authorize('update', $plantStock);
+        $updatedStock = $this->stockService->restock($plantStock, (int) $request->validated('quantity'));
+        $updatedStock->load('sample');
+        return new PlantStockResource($updatedStock);
     }
 
     public function destroy(PlantStock $plantStock): JsonResponse
