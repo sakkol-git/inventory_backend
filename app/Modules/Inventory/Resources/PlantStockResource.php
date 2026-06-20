@@ -18,6 +18,7 @@ class PlantStockResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'plant_sample_id' => $this->plant_sample_id,
             'inventory' => [
                 'total' => $this->quantity,
                 'reserved' => $this->reserved_quantity,
